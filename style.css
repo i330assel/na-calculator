@@ -378,3 +378,14 @@ footer {
     background-color: var(--accent);
     color: #ffffff;
 }
+
+/* ── Элемент расчёта в списке ── */
+.calc-item {
+    background-color: rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--border-clr);
+    transition: background-color 0.15s ease;
+}
+
+.calc-item:hover {
+    background-color: var(--accent-dim);
+}
