@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ распределения Вейбулла</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- НАВБАР -->
+    <nav class="navbar navbar-dark border-bottom border-secondary">
+        <div class="container-lg">
+            <span class="navbar-brand mb-0 fw-semibold">
+                <i class="bi bi-graph-up-arrow me-2 text-warning"></i>
+                Weibull Analysis
+            </span>
+            <span class="badge bg-secondary font-mono">v2.0</span>
+        </div>
+    </nav>
+
+    <!-- ЗАГОЛОВОК -->
+    <div class="hero-section py-5">
+        <div class="container-lg">
+            <p class="text-warning font-mono small mb-2 text-uppercase ls-wide">Инструмент анализа надёжности</p>
+            <h1 class="display-5 fw-semibold mb-2">Распределение Вейбулла</h1>
+            <p class="text-secondary mb-0">PDF · CDF · SF · Метод Монте-Карло · Загрузка Excel</p>
+        </div>
+    </div>
+
+    <main class="container-lg py-4">
+
+        <!-- БЛОК 1: ЗАГРУЗКА EXCEL -->
+        <div class="card app-card mb-4">
+            <div class="card-header d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark font-mono">01</span>
+                <span class="fw-semibold">Загрузка данных из Excel</span>
+            </div>
+            <div class="card-body">
+
+                <p class="text-secondary small mb-3">
+                    Загрузите <code>.xlsx</code> файл и укажите адреса ячеек.<br>
+                    Форматы: одна ячейка — <code>A1</code>, диапазон — <code>A2:A50</code>
+                </p>
+
+                <!-- Зона загрузки -->
+                <div class="upload-zone mb-3" id="uploadZone">
+                    <i class="bi bi-cloud-upload fs-2 text-secondary mb-2 d-block"></i>
+                    <p class="mb-1 fw-medium">Перетащите .xlsx файл сюда</p>
+                    <p class="text-secondary small mb-3">или</p>
+                    <label for="excelFile" class="btn btn-outline-warning btn-sm font-mono">
+                        <i class="bi bi-folder2-open me-1"></i> Выбрать файл
+                    </label>
+                    <input type="file" id="excelFile" accept=".xlsx,.xls" class="d-none">
+                    <div id="fileName" class="mt-2 small font-mono text-info"></div>
+                </div>
+
+                <!-- Превью таблицы -->
+                <div id="previewSection" class="d-none mb-3">
+                    <p class="text-secondary small text-uppercase font-mono ls-wide mb-2">
+                        <i class="bi bi-table me-1"></i> Превью (первые 10 строк):
+                    </p>
+                    <div class="table-responsive rounded border border-secondary">
+                        <table id="previewTable"
+                            class="table table-dark table-sm table-bordered table-hover mb-0 font-mono small"></table>
+                    </div>
+                </div>
+
+                <!-- Маппинг ячеек -->
+                <div id="mappingSection" class="d-none">
+                    <p class="text-secondary small text-uppercase font-mono ls-wide mb-3">
+                        <i class="bi bi-cursor-text me-1"></i> Укажите ячейки с данными:
+                    </p>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label small text-secondary">
+                                Параметр формы <span class="text-warning">k</span>
+                                <span class="text-muted">(одна ячейка)</span>
+                            </label>
+                            <input type="text" id="cell-k" class="form-control app-input font-mono"
+                                placeholder="напр. A1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-secondary">
+                                Параметр масштаба <span class="text-warning">λ</span>
+                                <span class="text-muted">(одна ячейка)</span>
+                            </label>
+                            <input type="text" id="cell-lambda" class="form-control app-input font-mono"
+                                placeholder="напр. B1">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-secondary">
+                                Значение <span class="text-warning">x</span>
+                                <span class="text-muted">(ячейка или диапазон)</span>
+                            </label>
+                            <input type="text" id="cell-x" class="form-control app-input font-mono"
+                                placeholder="напр. C2 или C2:C50">
+                        </div>
+                    </div>
+                    <button id="load-from-excel" class="btn btn-warning font-mono btn-sm">
+                        <i class="bi bi-download me-1"></i> Загрузить данные из файла
+                    </button>
+                    <div id="excel-status" class="mt-2 small font-mono"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- БЛОК 2: РАСЧЁТ ВЕЙБУЛЛА -->
+        <div class="card app-card mb-4">
+            <div class="card-header d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark font-mono">02</span>
+                <span class="fw-semibold">Параметры и расчёт</span>
+            </div>
+            <div class="card-body">
+
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label small text-secondary">Параметр формы <span
+                                class="text-warning">(k)</span></label>
+                        <input type="number" id="shape-param" value="1" step="0.1" min="0.01"
+                            class="form-control app-input font-mono">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label small text-secondary">Параметр масштаба <span
+                                class="text-warning">(λ)</span></label>
+                        <input type="number" id="scale-param" value="1" step="0.1" min="0.01"
+                            class="form-control app-input font-mono">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label small text-secondary">Значение x <span
+                                class="text-muted">(необязательно)</span></label>
+                        <input type="number" id="x-value" step="0.1" min="0" class="form-control app-input font-mono"
+                            placeholder="—">
+                    </div>
+                    <div class="col-sm-6 col-lg-3">
+                        <label class="form-label small text-secondary">Тип расчёта</label>
+                        <select id="calculation-type" class="form-select app-input font-mono">
+                            <option value="pdf">PDF — Плотность вероятности</option>
+                            <option value="cdf">CDF — Функция распределения</option>
+                            <option value="sf">SF — Функция надёжности</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    <button id="calculate-button" class="btn btn-warning font-mono">
+                        <i class="bi bi-calculator me-1"></i> Рассчитать
+                    </button>
+                    <button id="clear-button" class="btn btn-outline-secondary font-mono">
+                        <i class="bi bi-x-circle me-1"></i> Очистить всё
+                    </button>
+                </div>
+
+                <!-- Результат -->
+                <div id="result-area" class="d-none mb-4">
+                    <div class="alert-result d-flex align-items-center gap-3">
+                        <i class="bi bi-check-circle-fill text-warning fs-5"></i>
+                        <div>
+                            <div class="text-secondary small text-uppercase font-mono ls-wide">Результат</div>
+                            <div id="result-text" class="fw-semibold font-mono fs-5 text-warning"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-box">
+                    <canvas id="weibullChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- БЛОК 3: МОНТЕ-КАРЛО -->
+        <div class="card app-card mb-5">
+            <div class="card-header d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark font-mono">03</span>
+                <span class="fw-semibold">Метод Монте-Карло</span>
+            </div>
+            <div class="card-body">
+
+                <p class="text-secondary small mb-3">
+                    Использует параметры <span class="text-warning">k</span> и
+                    <span class="text-warning">λ</span> из блока выше.
+                </p>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6 col-md-4 col-lg-3">
+                        <label class="form-label small text-secondary">Количество выборок <span
+                                class="text-warning">(N)</span></label>
+                        <input type="number" id="monte-carlo-samples" value="1000" min="1"
+                            class="form-control app-input font-mono">
+                    </div>
+                </div>
+
+                <button id="monte-carlo-button" class="btn btn-warning font-mono mb-4">
+                    <i class="bi bi-shuffle me-1"></i> Запустить симуляцию
+                </button>
+
+                <div id="mc-result-area" class="d-none mb-4">
+                    <div class="alert-result d-flex align-items-center gap-3">
+                        <i class="bi bi-bar-chart-fill text-info fs-5"></i>
+                        <div id="monte-carlo-text" class="font-mono small"></div>
+                    </div>
+                </div>
+
+                <div class="chart-box">
+                    <canvas id="monteCarloChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-top border-secondary py-3 text-center text-secondary small font-mono">
+        Weibull Analysis Tool · Данные обрабатываются только в браузере, ничего не отправляется на сервер
+    </footer>
+
+    <!-- Скрипты — порядок важен! -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

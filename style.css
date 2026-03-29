@@ -1,0 +1,193 @@
+/* ================================================
+   style.css — кастомные стили ПОВЕРХ Bootstrap
+   Bootstrap делает: сетку, кнопки, отступы, таблицы
+   Этот файл делает: тёмную тему и спецэлементы
+   ================================================ */
+
+:root {
+    --bg-page: #0d0f12;
+    --bg-card: #13161b;
+    --bg-input: #1a1d24;
+    --border-clr: #2a2e38;
+    --accent: #ffc107;
+    --accent-dim: rgba(255, 193, 7, 0.10);
+    --text-main: #e2e5ed;
+    --text-muted: #6b7280;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ── Базовые ── */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    min-height: 100vh;
+}
+
+.font-mono {
+    font-family: var(--font-mono) !important;
+}
+
+.ls-wide {
+    letter-spacing: 0.08em;
+}
+
+/* ── Навбар ── */
+.navbar {
+    background-color: var(--bg-card) !important;
+}
+
+/* ── Hero-секция ── */
+.hero-section {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-clr);
+}
+
+/* ── Карточки ── */
+.app-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-clr);
+    border-radius: 8px;
+}
+
+.app-card .card-header {
+    background-color: rgba(255, 193, 7, 0.06);
+    border-bottom: 1px solid var(--border-clr);
+    padding: 0.75rem 1.25rem;
+}
+
+/* ── Инпуты — переопределяем цвета Bootstrap ── */
+.app-input,
+.app-input:focus {
+    background-color: var(--bg-input) !important;
+    border-color: var(--border-clr) !important;
+    color: var(--text-main) !important;
+    box-shadow: none !important;
+}
+
+.app-input:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15) !important;
+}
+
+.app-input option {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+}
+
+.app-input::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 1;
+}
+
+/* ── Зона загрузки файла ── */
+.upload-zone {
+    border: 2px dashed var(--border-clr);
+    border-radius: 8px;
+    background-color: var(--bg-input);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+    border-color: var(--accent);
+    background-color: var(--accent-dim);
+}
+
+/* ── Превью таблица (Bootstrap table-dark + доводка) ── */
+#previewTable thead th {
+    background-color: rgba(255, 193, 7, 0.10);
+    color: var(--accent);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+}
+
+#previewTable tbody td {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+/* ── Блок результата ── */
+.alert-result {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-clr);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+}
+
+/* ── Статусные сообщения Excel ── */
+#excel-status.success {
+    color: #4ade80;
+}
+
+#excel-status.error {
+    color: #f87171;
+}
+
+#excel-status.info {
+    color: #38bdf8;
+}
+
+/* ── Контейнер графика ── */
+.chart-box {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-clr);
+    border-radius: 8px;
+    padding: 1rem;
+    height: 360px;
+    position: relative;
+}
+
+/* ── Bootstrap кнопки — небольшая доводка ── */
+.btn-outline-secondary {
+    border-color: var(--border-clr);
+    color: var(--text-muted);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--bg-input);
+    border-color: var(--text-muted);
+    color: var(--text-main);
+}
+
+/* ── Inline code ── */
+code {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-clr);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: var(--font-mono);
+    font-size: 0.83em;
+    color: #38bdf8;
+}
+
+/* ── Footer ── */
+footer {
+    background-color: var(--bg-card);
+}
+
+/* ── Скроллбар (Chrome/Edge) ── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-page);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-clr);
+    border-radius: 3px;
+}
+
+/* ── Адаптив ── */
+@media (max-width: 576px) {
+    .chart-box {
+        height: 260px;
+    }
+}
