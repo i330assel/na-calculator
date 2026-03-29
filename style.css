@@ -1,25 +1,39 @@
 /* ================================================
-   style.css — кастомные стили ПОВЕРХ Bootstrap
-   Bootstrap делает: сетку, кнопки, отступы, таблицы
-   Этот файл делает: тёмную тему и спецэлементы
+   style.css — современный светлый дизайн
    ================================================ */
 
 :root {
-    --bg-page: #0d0f12;
-    --bg-card: #13161b;
-    --bg-input: #1a1d24;
-    --border-clr: #2a2e38;
-    --accent: #ffc107;
-    --accent-dim: rgba(255, 193, 7, 0.10);
-    --text-main: #e2e5ed;
+    --bg-page: #f0f2f5;
+    --bg-card: rgba(255, 255, 255, 0.85);
+    --bg-input: #ffffff;
+    --bg-header: rgba(255, 255, 255, 0.6);
+    --border-clr: rgba(0, 0, 0, 0.08);
+    --accent: #5b6ef5;
+    --accent-dim: rgba(91, 110, 245, 0.08);
+    --text-main: #1a1d2e;
     --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --success: #10b981;
+    --danger: #ef4444;
+    --info: #3b82f6;
     --font-mono: 'JetBrains Mono', monospace;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 /* ── Базовые ── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-page);
+    /* Лёгкий паттерн на фоне */
+    background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.04) 1px, transparent 0);
+    background-size: 24px 24px;
     color: var(--text-main);
     min-height: 100vh;
 }
@@ -29,66 +43,114 @@ body {
 }
 
 .ls-wide {
-    letter-spacing: 0.08em;
+    letter-spacing: 0.07em;
 }
 
 /* ── Навбар ── */
 .navbar {
-    background-color: var(--bg-card) !important;
+    background-color: rgba(255, 255, 255, 0.80) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-clr) !important;
+    box-shadow: var(--shadow-sm);
 }
 
-/* ── Hero-секция ── */
+.navbar .navbar-brand {
+    color: var(--text-main) !important;
+}
+
+.navbar .badge {
+    background-color: #e5e7eb !important;
+    color: var(--text-muted) !important;
+}
+
+/* ── Hero ── */
 .hero-section {
-    background-color: var(--bg-card);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 242, 255, 0.9) 100%);
+    backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border-clr);
+}
+
+.hero-section h1 {
+    color: var(--text-main);
+}
+
+.hero-section .text-warning {
+    color: var(--accent) !important;
 }
 
 /* ── Карточки ── */
 .app-card {
     background-color: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-clr);
-    border-radius: 8px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
 }
 
 .app-card .card-header {
-    background-color: rgba(255, 193, 7, 0.06);
+    background-color: var(--bg-header);
     border-bottom: 1px solid var(--border-clr);
-    padding: 0.75rem 1.25rem;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 1rem 1.5rem;
+    /* Исправляем цвет текста заголовков */
+    color: var(--text-main) !important;
 }
 
-/* ── Инпуты — переопределяем цвета Bootstrap ── */
+/* Бейджи 01 02 03 */
+.app-card .card-header .badge {
+    background-color: var(--accent-dim) !important;
+    color: var(--accent) !important;
+    font-size: 0.7rem;
+    padding: 0.35em 0.6em;
+}
+
+/* Текст заголовка карточки */
+.app-card .card-header .fw-semibold {
+    color: var(--text-main) !important;
+}
+
+/* ── Инпуты ── */
 .app-input,
 .app-input:focus {
     background-color: var(--bg-input) !important;
     border-color: var(--border-clr) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
     color: var(--text-main) !important;
     box-shadow: none !important;
+    border-radius: 8px !important;
 }
 
 .app-input:focus {
     border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.15) !important;
-}
-
-.app-input option {
-    background-color: var(--bg-card);
-    color: var(--text-main);
+    box-shadow: 0 0 0 3px rgba(91, 110, 245, 0.12) !important;
 }
 
 .app-input::placeholder {
-    color: var(--text-muted) !important;
+    color: var(--text-light) !important;
     opacity: 1;
 }
 
-/* ── Зона загрузки файла ── */
+.app-input option {
+    background-color: #ffffff;
+    color: var(--text-main);
+}
+
+/* ── Labels ── */
+.form-label {
+    color: var(--text-muted) !important;
+}
+
+/* ── Зона загрузки ── */
 .upload-zone {
-    border: 2px dashed var(--border-clr);
-    border-radius: 8px;
-    background-color: var(--bg-input);
+    border: 2px dashed rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    background-color: rgba(91, 110, 245, 0.03);
     padding: 2.5rem 1.5rem;
     text-align: center;
     cursor: pointer;
-    transition: border-color 0.15s ease, background-color 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .upload-zone:hover,
@@ -97,97 +159,176 @@ body {
     background-color: var(--accent-dim);
 }
 
-/* ── Превью таблица (Bootstrap table-dark + доводка) ── */
+.upload-zone .bi-cloud-upload {
+    color: var(--accent) !important;
+    opacity: 0.6;
+}
+
+.upload-zone p {
+    color: var(--text-muted);
+}
+
+/* ── Кнопка выбора файла ── */
+.btn-outline-warning {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    border-radius: 8px !important;
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--accent) !important;
+    color: #fff !important;
+}
+
+/* ── Таблица превью ── */
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#previewTable {
+    background: #ffffff;
+    color: var(--text-main) !important;
+}
+
 #previewTable thead th {
-    background-color: rgba(255, 193, 7, 0.10);
+    background-color: var(--accent-dim);
     color: var(--accent);
     font-size: 0.78rem;
     letter-spacing: 0.06em;
+    border-color: var(--border-clr) !important;
 }
 
 #previewTable tbody td {
     font-size: 0.78rem;
     color: var(--text-muted);
+    border-color: var(--border-clr) !important;
+}
+
+#previewTable tbody tr:hover td {
+    background-color: var(--accent-dim);
+}
+
+/* ── Кнопки ── */
+.btn-warning {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(91, 110, 245, 0.25);
+    transition: all 0.15s ease;
+}
+
+.btn-warning:hover {
+    background-color: #4557e8 !important;
+    border-color: #4557e8 !important;
+    box-shadow: 0 4px 12px rgba(91, 110, 245, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-outline-secondary {
+    border-color: rgba(0, 0, 0, 0.15) !important;
+    color: var(--text-muted) !important;
+    border-radius: 8px !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: var(--text-main) !important;
 }
 
 /* ── Блок результата ── */
 .alert-result {
-    background-color: var(--bg-input);
-    border: 1px solid var(--border-clr);
+    background-color: rgba(91, 110, 245, 0.06);
+    border: 1px solid rgba(91, 110, 245, 0.15);
     border-left: 3px solid var(--accent);
-    border-radius: 6px;
-    padding: 0.9rem 1.1rem;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    color: var(--text-main);
 }
 
-/* ── Статусные сообщения Excel ── */
+.alert-result .text-warning {
+    color: var(--accent) !important;
+}
+
+/* ── Статус Excel ── */
 #excel-status.success {
-    color: #4ade80;
+    color: var(--success);
 }
 
 #excel-status.error {
-    color: #f87171;
+    color: var(--danger);
 }
 
 #excel-status.info {
-    color: #38bdf8;
+    color: var(--info);
 }
 
-/* ── Контейнер графика ── */
+/* ── Графики ── */
 .chart-box {
-    background-color: var(--bg-input);
+    background-color: rgba(255, 255, 255, 0.7);
     border: 1px solid var(--border-clr);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1rem;
     height: 360px;
     position: relative;
 }
 
-/* ── Bootstrap кнопки — небольшая доводка ── */
-.btn-outline-secondary {
-    border-color: var(--border-clr);
-    color: var(--text-muted);
-}
-
-.btn-outline-secondary:hover {
-    background-color: var(--bg-input);
-    border-color: var(--text-muted);
-    color: var(--text-main);
-}
-
 /* ── Inline code ── */
 code {
-    background-color: var(--bg-input);
-    border: 1px solid var(--border-clr);
-    border-radius: 3px;
-    padding: 1px 5px;
+    background-color: rgba(91, 110, 245, 0.08);
+    border: 1px solid rgba(91, 110, 245, 0.15);
+    border-radius: 4px;
+    padding: 1px 6px;
     font-family: var(--font-mono);
     font-size: 0.83em;
-    color: #38bdf8;
+    color: var(--accent);
+}
+
+/* ── Разделитель секций ── */
+.text-secondary {
+    color: var(--text-muted) !important;
 }
 
 /* ── Footer ── */
 footer {
-    background-color: var(--bg-card);
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    color: var(--text-muted) !important;
+    border-color: var(--border-clr) !important;
 }
 
-/* ── Скроллбар (Chrome/Edge) ── */
+/* ── Скроллбар ── */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--bg-page);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--border-clr);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
 }
 
 /* ── Адаптив ── */
 @media (max-width: 576px) {
     .chart-box {
         height: 260px;
+    }
+
+    .hero-section {
+        padding: 2rem 0 !important;
+    }
+
+    .app-card {
+        border-radius: 12px;
     }
 }
