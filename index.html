@@ -272,22 +272,22 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <script type="module">
-        import { initAuth, logout, saveCalculation, loadCalculations } from './dashboard.js'
+        import { initAuth, logout, saveCalculation } from './dashboard.js'
 
-        // Инициализация — проверяем авторизацию
         await initAuth()
-
-        // Выход
         window.logout = logout
 
-        // Сохранить текущий расчёт
         window.saveCalc = async function () {
             const k = parseFloat(document.getElementById('shape-param').value)
             const lambda = parseFloat(document.getElementById('scale-param').value)
             const calcType = document.getElementById('calculation-type').value
-            const result = parseFloat(document.getElementById('result-text').textContent)
+            const xVal = parseFloat(document.getElementById('x-value').value)
+            const resultText = document.getElementById('result-text').textContent
+            const result = parseFloat(resultText)
             const name = document.getElementById('calcName').value.trim()
+            const mcSamples = parseInt(document.getElementById('monte-carlo-samples').value)
             const statusEl = document.getElementById('saveStatus')
 
             if (!name) {
@@ -309,7 +309,9 @@
                 k,
                 lambda,
                 calc_type: calcType,
-                result: isNaN(result) ? null : result
+                x: isNaN(xVal) ? null : xVal,
+                result: isNaN(result) ? null : result,
+                mc_samples: isNaN(mcSamples) ? null : mcSamples
             })
 
             if (ok) {

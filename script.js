@@ -386,6 +386,9 @@ function buildWeibullChart(k, lambda, calculationType) {
     }
 }
 
+// Делаем функцию доступной глобально для dashboard.js
+window.buildWeibullChartGlobal = buildWeibullChart
+
 
 // ============================================================
 // ЧАСТЬ 4: МОНТЕ-КАРЛО
