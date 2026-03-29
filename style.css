@@ -332,3 +332,49 @@ footer {
         border-radius: 12px;
     }
 }
+
+
+
+
+
+/* ── Страница авторизации ── */
+.auth-card {
+    background-color: var(--bg-card);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-clr);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+}
+
+.text-accent {
+    color: var(--accent) !important;
+}
+
+.btn-accent {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.btn-accent:hover {
+    background-color: #4557e8;
+    border-color: #4557e8;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.nav-pills .nav-link {
+    color: var(--text-muted);
+    border-radius: 8px;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--accent);
+    color: #ffffff;
+}
