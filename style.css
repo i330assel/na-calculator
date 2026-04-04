@@ -389,3 +389,36 @@ footer {
 .calc-item:hover {
     background-color: var(--accent-dim);
 }
+
+/* ── Подсказки под полями ── */
+.param-hint {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.hint-item {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    line-height: 1.5;
+}
+
+/* ── Подсказка про x ── */
+.hint-box {
+    background-color: rgba(91, 110, 245, 0.06);
+    border: 1px solid rgba(91, 110, 245, 0.15);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-size: 0.83rem;
+    color: var(--text-muted);
+}
+
+.hint-box .bi {
+    color: var(--accent);
+}
+
+/* ── Цвет акцента для текста ── */
+.text-accent {
+    color: var(--accent) !important;
+}

@@ -290,13 +290,24 @@ document.getElementById('calculate-button').addEventListener('click', function (
     const x        = parseFloat(xInput);
     const isXValid = !isNaN(x) && x >= 0;
 
+    // Подсказка когда x не введён
+    const noXHint = document.getElementById('no-x-hint');
+    if (noXHint) {
+        if (!isXValid) noXHint.classList.remove('d-none');
+        else           noXHint.classList.add('d-none');
+    }
+
     if (isXValid) {
+        // Показываем x в заголовке результата
+        const resultXValue = document.getElementById('result-x-value');
+        if (resultXValue) resultXValue.textContent = x;
+
         let result;
         if (calculationType === 'pdf')      result = weibullPdf(x, k, lambda);
         else if (calculationType === 'cdf') result = weibullCdf(x, k, lambda);
         else                                result = weibullSf(x, k, lambda);
 
-        if (result === Infinity)                    showResult('∞ (бесконечность)', false);
+        if (result === Infinity)                     showResult('∞ (бесконечность)', false);
         else if (!isNaN(result) && isFinite(result)) showResult(result.toFixed(6), false);
         else                                         showResult('Ошибка при расчёте. Проверьте данные.', true);
     } else {
@@ -333,16 +344,36 @@ function buildWeibullChart(k, lambda, calculationType) {
         }
     }
 
-    const chartLabel = `Weibull ${calculationType.toUpperCase()} (k=${k.toFixed(2)}, λ=${lambda.toFixed(2)})`;
-    const titleText  = `Распределение Вейбулла: ${calculationType.toUpperCase()}`;
-    const monoFont   = { family: 'JetBrains Mono', size: 11 };
+    // Берём единицы измерения которые ввёл пользователь
+    const xUnits = document.getElementById('x-units')
+        ? document.getElementById('x-units').value.trim() || 'x'
+        : 'x';
+
+    // Умные названия осей
+    const yAxisLabels = {
+        pdf: 'Плотность вероятности',
+        cdf: 'Вероятность отказа (0–1)',
+        sf:  'Вероятность выживания (0–1)'
+    };
+
+    const chartTitles = {
+        pdf: 'PDF — Плотность вероятности отказа',
+        cdf: 'CDF — Накопленная вероятность отказа',
+        sf:  'SF — Функция надёжности'
+    };
+
+    const yLabel    = yAxisLabels[calculationType];
+    const titleText = chartTitles[calculationType];
+    const monoFont  = { family: 'JetBrains Mono', size: 11 };
 
     if (weibullChartInstance) {
-        weibullChartInstance.data.labels                   = labels;
-        weibullChartInstance.data.datasets[0].data         = data;
-        weibullChartInstance.data.datasets[0].label        = chartLabel;
-        weibullChartInstance.options.scales.y.max          = yMax * 1.1;
-        weibullChartInstance.options.plugins.title.text    = titleText;
+        weibullChartInstance.data.labels                 = labels;
+        weibullChartInstance.data.datasets[0].data       = data;
+        weibullChartInstance.data.datasets[0].label      = `Weibull ${calculationType.toUpperCase()} (k=${k.toFixed(2)}, λ=${lambda.toFixed(2)})`;
+        weibullChartInstance.options.scales.y.max        = yMax * 1.1;
+        weibullChartInstance.options.plugins.title.text  = titleText;
+        weibullChartInstance.options.scales.x.title.text = xUnits;
+        weibullChartInstance.options.scales.y.title.text = yLabel;
         weibullChartInstance.update();
     } else {
         weibullChartInstance = new Chart(ctx, {
@@ -350,10 +381,10 @@ function buildWeibullChart(k, lambda, calculationType) {
             data: {
                 labels,
                 datasets: [{
-                    label:           chartLabel,
+                    label:           `Weibull ${calculationType.toUpperCase()} (k=${k.toFixed(2)}, λ=${lambda.toFixed(2)})`,
                     data,
-                    borderColor:     '#ffc107',
-                    backgroundColor: 'rgba(255,193,7,0.07)',
+                    borderColor:     '#5b6ef5',
+                    backgroundColor: 'rgba(91,110,245,0.07)',
                     tension:         0.3,
                     fill:            true,
                     pointRadius:     0,
@@ -364,20 +395,20 @@ function buildWeibullChart(k, lambda, calculationType) {
                 responsive:          true,
                 maintainAspectRatio: false,
                 plugins: {
-                    title:  { display: true, text: titleText, color: '#9ca3af', font: { family: 'JetBrains Mono', size: 12 } },
-                    legend: { labels: { color: '#9ca3af', font: monoFont } }
+                    title:  { display: true, text: titleText, color: '#6b7280', font: { family: 'JetBrains Mono', size: 12 } },
+                    legend: { labels: { color: '#6b7280', font: monoFont } }
                 },
                 scales: {
                     x: {
-                        title: { display: true, text: 'Значение x', color: '#6b7280' },
+                        title: { display: true, text: xUnits, color: '#6b7280' },
                         ticks: { color: '#6b7280', font: monoFont },
-                        grid:  { color: 'rgba(255,255,255,0.05)' },
+                        grid:  { color: 'rgba(0,0,0,0.05)' },
                         min:   0
                     },
                     y: {
-                        title: { display: true, text: 'Значение функции', color: '#6b7280' },
+                        title: { display: true, text: yLabel, color: '#6b7280' },
                         ticks: { color: '#6b7280', font: monoFont },
-                        grid:  { color: 'rgba(255,255,255,0.05)' },
+                        grid:  { color: 'rgba(0,0,0,0.05)' },
                         max:   yMax * 1.1
                     }
                 }
@@ -385,6 +416,21 @@ function buildWeibullChart(k, lambda, calculationType) {
         });
     }
 }
+
+// Глобальная функция для dashboard.js
+window.buildWeibullChartGlobal = buildWeibullChart;
+
+// Подсказки при смене типа расчёта
+const calcTypeHints = {
+    pdf: 'Показывает в какой момент чаще всего происходят отказы',
+    cdf: 'Вероятность отказа ДО момента x (растёт от 0 до 1)',
+    sf:  'Вероятность что изделие ПЕРЕЖИВЁТ момент x (падает от 1 до 0)'
+};
+
+document.getElementById('calculation-type').addEventListener('change', function () {
+    const hint = document.getElementById('calcTypeHint');
+    if (hint) hint.innerHTML = `<span class="hint-item">${calcTypeHints[this.value]}</span>`;
+});
 
 // Делаем функцию доступной глобально для dashboard.js
 window.buildWeibullChartGlobal = buildWeibullChart
@@ -491,7 +537,7 @@ document.getElementById('monte-carlo-button').addEventListener('click', function
             },
             scales: {
                 x: {
-                    title: { display: true, text: 'Значение выборки', color: '#6b7280' },
+                    title: { display: true, text: document.getElementById('x-units').value.trim() || 'Значение выборки', color: '#6b7280' },
                     ticks: { color: '#6b7280', font: monoFont },
                     grid:  { color: 'rgba(255,255,255,0.05)' }
                 },

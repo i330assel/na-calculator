@@ -166,6 +166,9 @@ function renderCalculations(items) {
 }
 
 // Глобальные функции
+
+window.buildWeibullChartGlobal = buildWeibullChart;
+
 window.deleteCalc = async function(id) {
     if (confirm('Удалить этот расчёт?')) {
         await deleteCalculation(id)
