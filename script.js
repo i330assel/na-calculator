@@ -575,3 +575,182 @@ document.getElementById('clear-button').addEventListener('click', function () {
         monteCarloChartInstance = null;
     }
 });
+
+
+// ============================================================
+// ВКЛАДКИ
+// ============================================================
+
+window.switchTab = function(tab, btn) {
+    ['weibull', 'monte', 'reliability'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('d-none');
+    });
+    document.querySelectorAll('.app-tabs .nav-link').forEach(b => {
+        b.classList.remove('active');
+    });
+    document.getElementById(`tab-${tab}`).classList.remove('d-none');
+    if (btn) btn.classList.add('active');
+}
+
+// ============================================================
+// ВКЛАДКА 3: НАДЁЖНОСТЬ R(t) и MTBF
+// ============================================================
+
+let reliabilityChartInstance = null;
+
+document.getElementById('reliability-button').addEventListener('click', function() {
+    const lambda  = parseFloat(document.getElementById('rel-lambda').value);
+    const tInput  = document.getElementById('rel-t').value;
+    const units   = document.getElementById('rel-units').value.trim() || 'единиц времени';
+
+    if (isNaN(lambda) || lambda <= 0) {
+        alert('Введите корректное значение λ > 0');
+        return;
+    }
+
+    // MTBF = 1/λ
+    const mtbf = 1 / lambda;
+
+    // Показываем блок результатов
+    document.getElementById('rel-result-area').classList.remove('d-none');
+    document.getElementById('rel-mtbf').textContent = mtbf.toFixed(2) + ' ' + units;
+
+    // R(t) и F(t) — только если t введено
+    const t       = parseFloat(tInput);
+    const isTValid = !isNaN(t) && t >= 0;
+
+    if (isTValid) {
+        const rt = Math.exp(-lambda * t);
+        const ft = 1 - rt;
+
+        document.getElementById('rel-rt').textContent = (rt * 100).toFixed(2) + '%';
+        document.getElementById('rel-ft').textContent = (ft * 100).toFixed(2) + '%';
+
+        document.getElementById('rel-rt-hint').textContent =
+            `${(rt * 100).toFixed(1)}% изделий проработают дольше ${t} ${units}`;
+        document.getElementById('rel-ft-hint').textContent =
+            `${(ft * 100).toFixed(1)}% изделий откажут до ${t} ${units}`;
+
+        // Интерпретация
+        document.getElementById('rel-interpretation').innerHTML = `
+            <i class="bi bi-lightbulb me-2"></i>
+            При интенсивности отказов λ = ${lambda},
+            из 100 изделий примерно <strong>${Math.round(rt * 100)}</strong>
+            проработают дольше ${t} ${units},
+            и примерно <strong>${Math.round(ft * 100)}</strong> откажут раньше.
+            Среднее время между отказами — <strong>${mtbf.toFixed(1)} ${units}</strong>.
+        `;
+    } else {
+        document.getElementById('rel-rt').textContent = '—';
+        document.getElementById('rel-ft').textContent = '—';
+        document.getElementById('rel-interpretation').innerHTML = `
+            <i class="bi bi-info-circle me-2"></i>
+            MTBF = <strong>${mtbf.toFixed(2)} ${units}</strong>.
+            Введите значение t чтобы рассчитать вероятность выживания R(t).
+        `;
+    }
+
+    // График R(t)
+    buildReliabilityChart(lambda, units, isTValid ? t : null);
+});
+
+document.getElementById('reliability-clear').addEventListener('click', function() {
+    document.getElementById('rel-lambda').value  = '0.001';
+    document.getElementById('rel-t').value       = '';
+    document.getElementById('rel-units').value   = '';
+    document.getElementById('rel-result-area').classList.add('d-none');
+    if (reliabilityChartInstance) {
+        reliabilityChartInstance.destroy();
+        reliabilityChartInstance = null;
+    }
+});
+
+function buildReliabilityChart(lambda, units, tMark) {
+    const ctx    = document.getElementById('reliabilityChart').getContext('2d');
+    const points = 100;
+    const mtbf   = 1 / lambda;
+    const range  = mtbf * 4; // показываем 4 MTBF
+    const step   = range / points;
+
+    const labels = [];
+    const data   = [];
+
+    for (let i = 0; i <= points; i++) {
+        const t = i * step;
+        labels.push(t.toFixed(1));
+        data.push(Math.exp(-lambda * t));
+    }
+
+    const monoFont = { family: 'JetBrains Mono', size: 11 };
+
+    // Вертикальная линия в точке t если введено
+    const annotations = {};
+    if (tMark !== null) {
+        annotations.tLine = {
+            type:        'line',
+            xMin:        tMark.toFixed(1),
+            xMax:        tMark.toFixed(1),
+            borderColor: 'rgba(239,68,68,0.7)',
+            borderWidth: 2,
+            borderDash:  [4, 4],
+            label: {
+                display:     true,
+                content:     `t = ${tMark}`,
+                color:       '#ef4444',
+                font:        monoFont
+            }
+        };
+    }
+
+    if (reliabilityChartInstance) {
+        reliabilityChartInstance.destroy();
+    }
+
+    reliabilityChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label:           `R(t) = e^(-${lambda}·t)`,
+                data,
+                borderColor:     '#10b981',
+                backgroundColor: 'rgba(16,185,129,0.07)',
+                tension:         0.3,
+                fill:            true,
+                pointRadius:     0,
+                borderWidth:     2
+            }]
+        },
+        options: {
+            responsive:          true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text:    'Функция надёжности R(t) = e^(-λt)',
+                    color:   '#6b7280',
+                    font:    { family: 'JetBrains Mono', size: 12 }
+                },
+                legend: { labels: { color: '#6b7280', font: monoFont } }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: units, color: '#6b7280' },
+                    ticks: { color: '#6b7280', font: monoFont },
+                    grid:  { color: 'rgba(0,0,0,0.05)' }
+                },
+                y: {
+                    title: { display: true, text: 'Вероятность выживания', color: '#6b7280' },
+                    ticks: {
+                        color: '#6b7280',
+                        font:  monoFont,
+                        callback: (v) => (v * 100).toFixed(0) + '%'
+                    },
+                    grid:  { color: 'rgba(0,0,0,0.05)' },
+                    min:   0,
+                    max:   1
+                }
+            }
+        }
+    });
+}

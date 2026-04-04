@@ -422,3 +422,65 @@ footer {
 .text-accent {
     color: var(--accent) !important;
 }
+
+
+
+/* ── Вкладки ── */
+.app-tabs {
+    border-bottom: 2px solid var(--border-clr);
+    gap: 0.25rem;
+}
+
+.app-tabs .nav-link {
+    color: var(--text-muted);
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    margin-bottom: -2px;
+    transition: all 0.15s ease;
+}
+
+.app-tabs .nav-link:hover {
+    color: var(--text-main);
+    background: transparent;
+}
+
+.app-tabs .nav-link.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: transparent;
+    font-weight: 500;
+}
+
+/* ── Карточки статистики (MTBF, R(t), F(t)) ── */
+.stat-card {
+    background: rgba(91, 110, 245, 0.05);
+    border: 1px solid rgba(91, 110, 245, 0.15);
+    border-radius: 10px;
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+}
+
+.stat-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}

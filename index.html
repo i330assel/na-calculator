@@ -123,180 +123,284 @@
             </div>
         </div>
 
-        <!-- БЛОК 2: РАСЧЁТ ВЕЙБУЛЛА -->
-        <div class="card app-card mb-4">
-            <div class="card-header d-flex align-items-center gap-2">
-                <span class="badge bg-warning text-dark font-mono">02</span>
-                <span class="fw-semibold">Параметры и расчёт</span>
-            </div>
-            <div class="card-body">
-        
-                <!-- Единицы измерения -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <label class="form-label small text-secondary">
-                            Единицы измерения
-                            <span class="text-muted">(для подписи графика)</span>
-                        </label>
-                        <input type="text" id="x-units" class="form-control app-input" placeholder="напр. часы, циклы, км">
-                    </div>
-                </div>
-        
-                <div class="row g-3 mb-2">
-        
-                    <!-- k -->
-                    <div class="col-sm-6 col-lg-3">
-                        <label class="form-label small text-secondary">
-                            Параметр формы <span class="text-accent">(k)</span>
-                        </label>
-                        <input type="number" id="shape-param" value="1" step="0.1" min="0.01"
-                            class="form-control app-input font-mono">
-                        <div class="param-hint mt-1">
-                            <span class="hint-item">k &lt; 1 — ранние отказы</span>
-                            <span class="hint-item">k = 1 — случайные отказы</span>
-                            <span class="hint-item">k &gt; 1 — износ со временем</span>
-                        </div>
-                    </div>
-        
-                    <!-- lambda -->
-                    <div class="col-sm-6 col-lg-3">
-                        <label class="form-label small text-secondary">
-                            Параметр масштаба <span class="text-accent">(λ)</span>
-                        </label>
-                        <input type="number" id="scale-param" value="1" step="0.1" min="0.01"
-                            class="form-control app-input font-mono">
-                        <div class="param-hint mt-1">
-                            <span class="hint-item">Характерный срок службы</span>
-                            <span class="hint-item">≈ 63% изделий откажут к λ</span>
-                        </div>
-                    </div>
-        
-                    <!-- x -->
-                    <div class="col-sm-6 col-lg-3">
-                        <label class="form-label small text-secondary">
-                            Значение x
-                            <span class="badge bg-secondary ms-1" style="font-size:0.6rem">необязательно</span>
-                        </label>
-                        <input type="number" id="x-value" step="0.1" min="0" class="form-control app-input font-mono"
-                            placeholder="—">
-                        <div class="param-hint mt-1">
-                            <span class="hint-item">Конкретный момент времени</span>
-                            <span class="hint-item">Для точного числового результата</span>
-                        </div>
-                    </div>
-        
-                    <!-- Тип расчёта -->
-                    <div class="col-sm-6 col-lg-3">
-                        <label class="form-label small text-secondary">Тип расчёта</label>
-                        <select id="calculation-type" class="form-select app-input font-mono">
-                            <option value="pdf">PDF — Плотность вероятности</option>
-                            <option value="cdf">CDF — Вероятность отказа</option>
-                            <option value="sf">SF — Вероятность выживания</option>
-                        </select>
-                        <div class="param-hint mt-1" id="calcTypeHint">
-                            <span class="hint-item">Распределение вероятности отказа</span>
-                        </div>
-                    </div>
-        
-                </div>
-        
-                <!-- Кнопки -->
-                <div class="d-flex flex-wrap gap-2 mb-4 mt-3">
-                    <button id="calculate-button" class="btn btn-warning font-mono">
-                        <i class="bi bi-calculator me-1"></i> Рассчитать
-                    </button>
-                    <button id="clear-button" class="btn btn-outline-secondary font-mono">
-                        <i class="bi bi-x-circle me-1"></i> Очистить всё
-                    </button>
-                </div>
-        
-                <!-- Результат -->
-                <div id="result-area" class="d-none mb-3">
-                    <div class="alert-result d-flex align-items-center gap-3">
-                        <i class="bi bi-check-circle-fill text-accent fs-5"></i>
-                        <div>
-                            <div class="text-secondary small text-uppercase font-mono ls-wide">
-                                Результат для x = <span id="result-x-value">—</span>
-                            </div>
-                            <div id="result-text" class="fw-semibold font-mono fs-5"></div>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Подсказка когда x не введён -->
-                <div id="no-x-hint" class="d-none mb-3">
-                    <div class="hint-box">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Введите значение x чтобы получить точный числовой результат
-                    </div>
-                </div>
-        
-                <div class="chart-box">
-                    <canvas id="weibullChart"></canvas>
-                </div>
-        
-            </div>
-        </div>
-
-        <!-- БЛОК 3: МОНТЕ-КАРЛО -->
-        <div class="card app-card mb-4">
-            <div class="card-header d-flex align-items-center gap-2">
-                <span class="badge bg-warning text-dark font-mono">03</span>
-                <span class="fw-semibold">Метод Монте-Карло</span>
-            </div>
-            <div class="card-body">
-        
-                <p class="text-secondary small mb-3">
-                    Использует параметры <span class="text-accent fw-medium">k</span> и
-                    <span class="text-accent fw-medium">λ</span> из блока выше.
-                    Генерирует случайные выборки и строит гистограмму распределения.
-                </p>
-        
-                <div class="row g-3 mb-2">
-                    <div class="col-sm-6 col-md-4 col-lg-3">
-                        <label class="form-label small text-secondary">
-                            Количество выборок <span class="text-accent">(N)</span>
-                        </label>
-                        <input type="number" id="monte-carlo-samples" value="1000" min="1"
-                            class="form-control app-input font-mono">
-                        <div class="param-hint mt-1">
-                            <span class="hint-item">1 000 — быстро</span>
-                            <span class="hint-item">10 000 — точнее</span>
-                            <span class="hint-item">100 000 — максимальная точность</span>
-                        </div>
-                    </div>
-                </div>
-        
-                <button id="monte-carlo-button" class="btn btn-warning font-mono mt-3 mb-4">
-                    <i class="bi bi-shuffle me-1"></i> Запустить симуляцию
+        <!-- ВКЛАДКИ -->
+        <ul class="nav nav-tabs app-tabs mb-4" id="mainTabs">
+            <li class="nav-item">
+                <button class="nav-link active" onclick="switchTab('weibull', this)">
+                    <i class="bi bi-graph-up me-1"></i> Вейбулл
                 </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" onclick="switchTab('monte', this)">
+                    <i class="bi bi-shuffle me-1"></i> Монте-Карло
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" onclick="switchTab('reliability', this)">
+                    <i class="bi bi-shield-check me-1"></i> Надёжность R(t)
+                </button>
+            </li>
+        </ul>
         
-                <div id="mc-result-area" class="d-none mb-4">
-                    <div class="alert-result d-flex align-items-center gap-3">
-                        <i class="bi bi-bar-chart-fill text-accent fs-5"></i>
-                        <div id="monte-carlo-text" class="font-mono small"></div>
+        <!-- ══ ВКЛАДКА 1: ВЕЙБУЛЛ ══ -->
+        <div id="tab-weibull">
+            <div class="card app-card mb-4">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark font-mono">02</span>
+                    <span class="fw-semibold">Параметры и расчёт</span>
+                </div>
+                <div class="card-body">
+        
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small text-secondary">
+                                Единицы измерения
+                                <span class="text-muted">(для подписи графика)</span>
+                            </label>
+                            <input type="text" id="x-units" class="form-control app-input" placeholder="напр. часы, циклы, км">
+                        </div>
                     </div>
-                </div>
         
-                <div class="chart-box">
-                    <canvas id="monteCarloChart"></canvas>
-                </div>
+                    <div class="row g-3 mb-2">
         
+                        <div class="col-sm-6 col-lg-3">
+                            <label class="form-label small text-secondary">
+                                Параметр формы <span class="text-accent">(k)</span>
+                            </label>
+                            <input type="number" id="shape-param" value="1" step="0.1" min="0.01"
+                                class="form-control app-input font-mono">
+                            <div class="param-hint mt-1">
+                                <span class="hint-item">k &lt; 1 — ранние отказы</span>
+                                <span class="hint-item">k = 1 — случайные отказы</span>
+                                <span class="hint-item">k &gt; 1 — износ со временем</span>
+                            </div>
+                        </div>
+        
+                        <div class="col-sm-6 col-lg-3">
+                            <label class="form-label small text-secondary">
+                                Параметр масштаба <span class="text-accent">(λ)</span>
+                            </label>
+                            <input type="number" id="scale-param" value="1" step="0.1" min="0.01"
+                                class="form-control app-input font-mono">
+                            <div class="param-hint mt-1">
+                                <span class="hint-item">Характерный срок службы</span>
+                                <span class="hint-item">≈ 63% изделий откажут к λ</span>
+                            </div>
+                        </div>
+        
+                        <div class="col-sm-6 col-lg-3">
+                            <label class="form-label small text-secondary">
+                                Значение x
+                                <span class="badge bg-secondary ms-1" style="font-size:0.6rem">необязательно</span>
+                            </label>
+                            <input type="number" id="x-value" step="0.1" min="0" class="form-control app-input font-mono"
+                                placeholder="—">
+                            <div class="param-hint mt-1">
+                                <span class="hint-item">Конкретный момент времени</span>
+                                <span class="hint-item">Для точного числового результата</span>
+                            </div>
+                        </div>
+        
+                        <div class="col-sm-6 col-lg-3">
+                            <label class="form-label small text-secondary">Тип расчёта</label>
+                            <select id="calculation-type" class="form-select app-input font-mono">
+                                <option value="pdf">PDF — Плотность вероятности</option>
+                                <option value="cdf">CDF — Вероятность отказа</option>
+                                <option value="sf">SF — Вероятность выживания</option>
+                            </select>
+                            <div class="param-hint mt-1" id="calcTypeHint">
+                                <span class="hint-item">Распределение вероятности отказа</span>
+                            </div>
+                        </div>
+        
+                    </div>
+        
+                    <div class="d-flex flex-wrap gap-2 mb-4 mt-3">
+                        <button id="calculate-button" class="btn btn-warning font-mono">
+                            <i class="bi bi-calculator me-1"></i> Рассчитать
+                        </button>
+                        <button id="clear-button" class="btn btn-outline-secondary font-mono">
+                            <i class="bi bi-x-circle me-1"></i> Очистить всё
+                        </button>
+                    </div>
+        
+                    <div id="result-area" class="d-none mb-3">
+                        <div class="alert-result d-flex align-items-center gap-3">
+                            <i class="bi bi-check-circle-fill text-accent fs-5"></i>
+                            <div>
+                                <div class="text-secondary small text-uppercase font-mono ls-wide">
+                                    Результат для x = <span id="result-x-value">—</span>
+                                </div>
+                                <div id="result-text" class="fw-semibold font-mono fs-5"></div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div id="no-x-hint" class="d-none mb-3">
+                        <div class="hint-box">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Введите значение x чтобы получить точный числовой результат
+                        </div>
+                    </div>
+        
+                    <div class="chart-box">
+                        <canvas id="weibullChart"></canvas>
+                    </div>
+        
+                </div>
             </div>
         </div>
-
-        <!-- БЛОК 4: ЛИЧНЫЙ КАБИНЕТ -->
+        
+        <!-- ══ ВКЛАДКА 2: МОНТЕ-КАРЛО ══ -->
+        <div id="tab-monte" class="d-none">
+            <div class="card app-card mb-4">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark font-mono">03</span>
+                    <span class="fw-semibold">Метод Монте-Карло</span>
+                </div>
+                <div class="card-body">
+        
+                    <p class="text-secondary small mb-3">
+                        Использует параметры <span class="text-accent fw-medium">k</span> и
+                        <span class="text-accent fw-medium">λ</span> из вкладки Вейбулл.
+                        Генерирует случайные выборки и строит гистограмму распределения.
+                    </p>
+        
+                    <div class="row g-3 mb-2">
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <label class="form-label small text-secondary">
+                                Количество выборок <span class="text-accent">(N)</span>
+                            </label>
+                            <input type="number" id="monte-carlo-samples" value="1000" min="1"
+                                class="form-control app-input font-mono">
+                            <div class="param-hint mt-1">
+                                <span class="hint-item">1 000 — быстро</span>
+                                <span class="hint-item">10 000 — точнее</span>
+                                <span class="hint-item">100 000 — максимальная точность</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <button id="monte-carlo-button" class="btn btn-warning font-mono mt-3 mb-4">
+                        <i class="bi bi-shuffle me-1"></i> Запустить симуляцию
+                    </button>
+        
+                    <div id="mc-result-area" class="d-none mb-4">
+                        <div class="alert-result d-flex align-items-center gap-3">
+                            <i class="bi bi-bar-chart-fill text-accent fs-5"></i>
+                            <div id="monte-carlo-text" class="font-mono small"></div>
+                        </div>
+                    </div>
+        
+                    <div class="chart-box">
+                        <canvas id="monteCarloChart"></canvas>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+        
+        <!-- ══ ВКЛАДКА 3: НАДЁЖНОСТЬ R(t) ══ -->
+        <div id="tab-reliability" class="d-none">
+            <div class="card app-card mb-4">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark font-mono">04</span>
+                    <span class="fw-semibold">Надёжность R(t) и MTBF</span>
+                </div>
+                <div class="card-body">
+        
+                    <p class="text-secondary small mb-4">
+                        Экспоненциальная модель надёжности для случайных отказов (k = 1).
+                        Применяется для восстанавливаемых систем и электронных компонентов.
+                    </p>
+        
+                    <div class="row g-3 mb-2">
+        
+                        <div class="col-sm-6 col-lg-3">
+                            <label class="form-label small text-secondary">
+                                Интенсивность отказов <span class="text-accent">(λ)</span>
+                            </label>
+                            <input type="number" id="rel-lambda" value="0.001" step="0.0001" min="0.000001"
+                                class="form-control app-input font-mono">
+                            <div class="param-hint mt-1">
+                                <span class="hint-item">Отказов в единицу времени</span>
+                                <span class="hint-item">0.001 = 1 отказ / 1000 часов</span>
+                            </div>
+                        </div>
+        
+                        <div class="col-sm-6 col-lg-3">
+                            <label class="form-label small text-secondary">
+                                Момент времени <span class="text-accent">(t)</span>
+                                <span class="badge bg-secondary ms-1" style="font-size:0.6rem">необязательно</span>
+                            </label>
+                            <input type="number" id="rel-t" step="1" min="0" class="form-control app-input font-mono"
+                                placeholder="—">
+                            <div class="param-hint mt-1">
+                                <span class="hint-item">Для расчёта R(t) в конкретной точке</span>
+                            </div>
+                        </div>
+        
+                        <div class="col-sm-6 col-lg-3">
+                            <label class="form-label small text-secondary">Единицы времени</label>
+                            <input type="text" id="rel-units" class="form-control app-input" placeholder="часы, циклы, км">
+                        </div>
+        
+                    </div>
+        
+                    <div class="d-flex flex-wrap gap-2 mt-3 mb-4">
+                        <button id="reliability-button" class="btn btn-warning font-mono">
+                            <i class="bi bi-calculator me-1"></i> Рассчитать
+                        </button>
+                        <button id="reliability-clear" class="btn btn-outline-secondary font-mono">
+                            <i class="bi bi-x-circle me-1"></i> Очистить
+                        </button>
+                    </div>
+        
+                    <div id="rel-result-area" class="d-none mb-4">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-label">MTBF</div>
+                                    <div class="stat-value" id="rel-mtbf">—</div>
+                                    <div class="stat-hint">Среднее время между отказами</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-label">R(t) — выживаемость</div>
+                                    <div class="stat-value" id="rel-rt">—</div>
+                                    <div class="stat-hint" id="rel-rt-hint">Вероятность выживания</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-label">F(t) — вероятность отказа</div>
+                                    <div class="stat-value" id="rel-ft">—</div>
+                                    <div class="stat-hint" id="rel-ft-hint">Вероятность отказа до t</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hint-box mt-2" id="rel-interpretation"></div>
+                    </div>
+        
+                    <div class="chart-box">
+                        <canvas id="reliabilityChart"></canvas>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+        
+        <!-- ══ БЛОК СОХРАНЕНИЯ ══ -->
         <div class="card app-card mb-5">
             <div class="card-header d-flex align-items-center gap-2">
-                <span class="badge bg-warning text-dark font-mono">04</span>
+                <span class="badge bg-warning text-dark font-mono">05</span>
                 <span class="fw-semibold">Сохранить расчёт</span>
             </div>
             <div class="card-body">
-        
                 <p class="text-secondary small mb-3">
                     Сохраните текущий расчёт в личный кабинет.
                 </p>
-        
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
                         <label class="form-label small text-secondary">Название расчёта</label>
@@ -304,23 +408,20 @@
                             placeholder="напр. Подшипник №3, Вал турбины">
                     </div>
                 </div>
-        
                 <button onclick="window.saveCalc()" class="btn btn-warning font-mono btn-sm">
                     <i class="bi bi-bookmark-plus me-1"></i> Сохранить расчёт
                 </button>
                 <div id="saveStatus" class="mt-2 small font-mono"></div>
-        
-                <!-- Список сохранённых расчётов -->
                 <hr class="my-4" style="border-color: var(--border-clr)">
                 <p class="text-secondary small text-uppercase font-mono ls-wide mb-3">
                     <i class="bi bi-clock-history me-1"></i> История расчётов:
                 </p>
                 <div id="calculationsList"></div>
-        
             </div>
         </div>
-
+        
     </main>
+        
 
     <footer class="border-top border-secondary py-3 text-center text-secondary small font-mono">
         Calculation and Analysis Tool Prototype
