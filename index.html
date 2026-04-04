@@ -246,6 +246,14 @@
                     <div class="chart-box">
                         <canvas id="weibullChart"></canvas>
                     </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button onclick="exportChartPNG('weibullChart', 'weibull')" class="btn btn-outline-secondary btn-sm font-mono">
+                            <i class="bi bi-image me-1"></i> Скачать PNG
+                        </button>
+                        <button onclick="exportChartCSV('weibull')" class="btn btn-outline-secondary btn-sm font-mono">
+                            <i class="bi bi-filetype-csv me-1"></i> Скачать CSV
+                        </button>
+                    </div>
         
                 </div>
             </div>
@@ -294,6 +302,12 @@
         
                     <div class="chart-box">
                         <canvas id="monteCarloChart"></canvas>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button onclick="exportChartPNG('monteCarloChart', 'monte-carlo')"
+                            class="btn btn-outline-secondary btn-sm font-mono">
+                            <i class="bi bi-image me-1"></i> Скачать PNG
+                        </button>
                     </div>
         
                 </div>
@@ -385,6 +399,15 @@
         
                     <div class="chart-box">
                         <canvas id="reliabilityChart"></canvas>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button onclick="exportChartPNG('reliabilityChart', 'reliability')"
+                            class="btn btn-outline-secondary btn-sm font-mono">
+                            <i class="bi bi-image me-1"></i> Скачать PNG
+                        </button>
+                        <button onclick="exportChartCSV('reliability')" class="btn btn-outline-secondary btn-sm font-mono">
+                            <i class="bi bi-filetype-csv me-1"></i> Скачать CSV
+                        </button>
                     </div>
         
                 </div>

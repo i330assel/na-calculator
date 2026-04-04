@@ -754,3 +754,76 @@ function buildReliabilityChart(lambda, units, tMark) {
         }
     });
 }
+
+// ============================================================
+// ЭКСПОРТ ГРАФИКОВ
+// ============================================================
+
+/**
+ * Скачивает график как PNG файл.
+ * Chart.js умеет конвертировать canvas в картинку через toBase64Image()
+ */
+window.exportChartPNG = function(canvasId, filename) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    // Создаём временный canvas с белым фоном
+    // (иначе фон будет прозрачным на некоторых устройствах)
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width  = canvas.width;
+    exportCanvas.height = canvas.height;
+
+    const ctx = exportCanvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    ctx.drawImage(canvas, 0, 0);
+
+    // Создаём ссылку и кликаем по ней программно
+    const link      = document.createElement('a');
+    link.download   = `${filename}-${new Date().toISOString().slice(0,10)}.png`;
+    link.href       = exportCanvas.toDataURL('image/png');
+    link.click();
+}
+
+/**
+ * Скачивает данные графика как CSV файл.
+ * Берёт данные из уже построенного Chart.js объекта.
+ */
+window.exportChartCSV = function(type) {
+    let chartInstance = null;
+    let headers       = '';
+
+    if (type === 'weibull') {
+        chartInstance = weibullChartInstance;
+        const calcType = document.getElementById('calculation-type').value.toUpperCase();
+        const units    = document.getElementById('x-units').value.trim() || 'x';
+        headers = `${units},${calcType}\n`;
+    } else if (type === 'reliability') {
+        chartInstance = reliabilityChartInstance;
+        const units = document.getElementById('rel-units').value.trim() || 't';
+        headers = `${units},R(t)\n`;
+    }
+
+    if (!chartInstance) {
+        alert('Сначала постройте график');
+        return;
+    }
+
+    // Берём метки и данные из Chart.js
+    const labels = chartInstance.data.labels;
+    const data   = chartInstance.data.datasets[0].data;
+
+    let csv = headers;
+    labels.forEach((label, i) => {
+        const value = data[i] !== null ? data[i] : '';
+        csv += `${label},${value}\n`;
+    });
+
+    // Скачиваем файл
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.download = `${type}-data-${new Date().toISOString().slice(0,10)}.csv`;
+    link.href     = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
