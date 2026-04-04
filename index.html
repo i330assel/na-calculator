@@ -455,8 +455,40 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    
     <script src="script.js"></script>
+
+    <script type="module">
+        import { initAuth, logout, collectAllData, saveCalculation } from './dashboard.js'
+
+        await initAuth()
+        window.logout = logout
+
+        window.saveCalc = async function () {
+            const name = document.getElementById('calcName').value.trim()
+            const statusEl = document.getElementById('saveStatus')
+
+            if (!name) {
+                statusEl.textContent = '✗ Введите название расчёта'
+                statusEl.style.color = '#ef4444'
+                return
+            }
+
+            statusEl.textContent = 'Сохраняем...'
+            statusEl.style.color = 'var(--text-muted)'
+
+            const data = collectAllData(name)
+            const ok = await saveCalculation(data)
+
+            if (ok) {
+                statusEl.textContent = '✓ Сохранено!'
+                statusEl.style.color = '#10b981'
+                document.getElementById('calcName').value = ''
+            } else {
+                statusEl.textContent = '✗ Ошибка сохранения'
+                statusEl.style.color = '#ef4444'
+            }
+        }
+    </script>
 </body>
 
 </html>
