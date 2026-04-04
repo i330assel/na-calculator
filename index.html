@@ -455,57 +455,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <script type="module">
-        import { initAuth, logout, saveCalculation } from './dashboard.js'
-
-        await initAuth()
-        window.logout = logout
-
-        window.saveCalc = async function () {
-            const k = parseFloat(document.getElementById('shape-param').value)
-            const lambda = parseFloat(document.getElementById('scale-param').value)
-            const calcType = document.getElementById('calculation-type').value
-            const xVal = parseFloat(document.getElementById('x-value').value)
-            const resultText = document.getElementById('result-text').textContent
-            const result = parseFloat(resultText)
-            const name = document.getElementById('calcName').value.trim()
-            const mcSamples = parseInt(document.getElementById('monte-carlo-samples').value)
-            const statusEl = document.getElementById('saveStatus')
-
-            if (!name) {
-                statusEl.textContent = '✗ Введите название расчёта'
-                statusEl.style.color = '#ef4444'
-                return
-            }
-            if (isNaN(k) || isNaN(lambda)) {
-                statusEl.textContent = '✗ Сначала выполните расчёт'
-                statusEl.style.color = '#ef4444'
-                return
-            }
-
-            statusEl.textContent = 'Сохраняем...'
-            statusEl.style.color = 'var(--text-muted)'
-
-            const ok = await saveCalculation({
-                name,
-                k,
-                lambda,
-                calc_type: calcType,
-                x: isNaN(xVal) ? null : xVal,
-                result: isNaN(result) ? null : result,
-                mc_samples: isNaN(mcSamples) ? null : mcSamples
-            })
-
-            if (ok) {
-                statusEl.textContent = '✓ Сохранено!'
-                statusEl.style.color = '#10b981'
-                document.getElementById('calcName').value = ''
-            } else {
-                statusEl.textContent = '✗ Ошибка сохранения'
-                statusEl.style.color = '#ef4444'
-            }
-        }
-    </script>
+    
     <script src="script.js"></script>
 </body>
 
