@@ -582,7 +582,7 @@ document.getElementById('clear-button').addEventListener('click', function () {
 // ============================================================
 
 window.switchTab = function(tab, btn) {
-    ['weibull', 'monte', 'reliability'].forEach(t => {
+    ['weibull', 'monte', 'reliability', 'fitting'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('d-none');
     });
     document.querySelectorAll('.app-tabs .nav-link').forEach(b => {
@@ -827,3 +827,284 @@ window.exportChartCSV = function(type) {
     link.click();
     URL.revokeObjectURL(link.href);
 }
+
+// ============================================================
+// ВКЛАДКА 4: АНАЛИЗ ДАННЫХ — ПОДБОР ПАРАМЕТРОВ (MLE)
+// ============================================================
+
+let fittingChartInstance = null;
+
+// ── Парсинг введённых данных ──
+function parseInputData(raw) {
+    // Разбиваем по запятым, точкам с запятой, пробелам, переносам строк
+    return raw
+        .split(/[,;\s\n]+/)
+        .map(s => parseFloat(s.trim()))
+        .filter(v => !isNaN(v) && v > 0);
+}
+
+// ── Загрузить данные из Excel в поле textarea ──
+window.loadFittingFromExcel = function() {
+    const rangeStr = document.getElementById('fitting-cell-range').value.trim();
+    if (!loadedSheet) {
+        alert('Сначала загрузите Excel файл в блоке "Загрузка данных из Excel"');
+        return;
+    }
+    if (!rangeStr) {
+        alert('Введите диапазон ячеек, напр. A2:A50');
+        return;
+    }
+    const values = readCellRange(loadedSheet, rangeStr);
+    if (!values || values.length === 0) {
+        alert('В указанном диапазоне нет числовых данных');
+        return;
+    }
+    document.getElementById('fitting-data').value = values.join(', ');
+}
+
+// ── Алгоритм MLE для распределения Вейбулла ──
+// Используем метод наименьших квадратов на Вейбулл-бумаге
+// (линеаризация через двойное логарифмирование)
+function fitWeibull(data) {
+    const n = data.length;
+
+    // Сортируем данные по возрастанию
+    const sorted = [...data].sort((a, b) => a - b);
+
+    // Медианный ранг — формула Бернарда
+    // F(i) = (i - 0.3) / (n + 0.4)
+    // Это оценка вероятности того что i-й элемент уже сломался
+    const ranks = sorted.map((_, i) => (i + 1 - 0.3) / (n + 0.4));
+
+    // Линеаризация Вейбулла:
+    // ln(ln(1/(1-F))) = k * ln(x) - k * ln(λ)
+    // Y = k * X + b
+    // где Y = ln(ln(1/(1-F))), X = ln(x)
+    const X = sorted.map(x => Math.log(x));
+    const Y = ranks.map(f => Math.log(Math.log(1 / (1 - f))));
+
+    // Метод наименьших квадратов для нахождения k и λ
+    const n2   = X.length;
+    const sumX  = X.reduce((a, b) => a + b, 0);
+    const sumY  = Y.reduce((a, b) => a + b, 0);
+    const sumXY = X.reduce((s, x, i) => s + x * Y[i], 0);
+    const sumX2 = X.reduce((s, x) => s + x * x, 0);
+
+    // k — наклон прямой
+    const k = (n2 * sumXY - sumX * sumY) / (n2 * sumX2 - sumX * sumX);
+
+    // b — свободный член, из него находим λ
+    const b      = (sumY - k * sumX) / n2;
+    const lambda = Math.exp(-b / k);
+
+    // R² — качество подбора
+    const yMean  = sumY / n2;
+    const yPred  = X.map(x => k * x + b);
+    const ssTot  = Y.reduce((s, y) => s + Math.pow(y - yMean, 2), 0);
+    const ssRes  = Y.reduce((s, y, i) => s + Math.pow(y - yPred[i], 2), 0);
+    const r2     = 1 - ssRes / ssTot;
+
+    return { k, lambda, r2, sorted, ranks };
+}
+
+// ── Интерпретация результатов ──
+function interpretFitting(k, r2) {
+    // Качество подбора
+    let qualityText = '';
+    let qualityIcon = '';
+    if (r2 >= 0.95) {
+        qualityText = 'Отличное совпадение — данные хорошо описываются распределением Вейбулла';
+        qualityIcon = '✓';
+    } else if (r2 >= 0.85) {
+        qualityText = 'Хорошее совпадение — модель достаточно точна для инженерных расчётов';
+        qualityIcon = '~';
+    } else if (r2 >= 0.7) {
+        qualityText = 'Приемлемое совпадение — используйте результаты с осторожностью';
+        qualityIcon = '⚠';
+    } else {
+        qualityText = 'Слабое совпадение — данные плохо описываются Вейбуллом. Проверьте данные';
+        qualityIcon = '✗';
+    }
+
+    // Интерпретация k
+    let kText = '';
+    if (k < 1) {
+        kText = `k < 1 (${k.toFixed(2)}) — характерно для ранних отказов (приработочный период)`;
+    } else if (k < 1.5) {
+        kText = `k ≈ 1 (${k.toFixed(2)}) — случайные отказы, не зависящие от возраста изделия`;
+    } else if (k < 3) {
+        kText = `k = ${k.toFixed(2)} — нормальный износ, отказы нарастают со временем`;
+    } else {
+        kText = `k > 3 (${k.toFixed(2)}) — быстрый износ, отказы концентрируются в узком диапазоне`;
+    }
+
+    return { qualityText, qualityIcon, kText };
+}
+
+// ── Построить Вейбулл-график с точками данных и кривой ──
+function buildFittingChart(sorted, ranks, k, lambda, units) {
+    const ctx = document.getElementById('fittingChart').getContext('2d');
+
+    // Точки данных (реальные наблюдения)
+    const scatterPoints = sorted.map((x, i) => ({
+        x: x,
+        y: ranks[i] * 100  // в процентах
+    }));
+
+    // Теоретическая кривая Вейбулла (CDF)
+    const maxX    = sorted[sorted.length - 1] * 1.3;
+    const linePoints = [];
+    for (let i = 0; i <= 100; i++) {
+        const x   = (maxX / 100) * i;
+        const cdf = (1 - Math.exp(-Math.pow(x / lambda, k))) * 100;
+        linePoints.push({ x, y: cdf });
+    }
+
+    const monoFont = { family: 'JetBrains Mono', size: 11 };
+    const xLabel   = units || 'Время до отказа';
+
+    if (fittingChartInstance) fittingChartInstance.destroy();
+
+    fittingChartInstance = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    // Теоретическая кривая
+                    label:           `Вейбулл CDF (k=${k.toFixed(2)}, λ=${lambda.toFixed(1)})`,
+                    data:            linePoints,
+                    type:            'line',
+                    borderColor:     '#5b6ef5',
+                    backgroundColor: 'rgba(91,110,245,0.06)',
+                    fill:            true,
+                    tension:         0.4,
+                    pointRadius:     0,
+                    borderWidth:     2,
+                    order:           2
+                },
+                {
+                    // Реальные данные
+                    label:           'Данные об отказах',
+                    data:            scatterPoints,
+                    backgroundColor: '#ef4444',
+                    borderColor:     '#ef4444',
+                    pointRadius:     6,
+                    pointHoverRadius: 8,
+                    order:           1
+                }
+            ]
+        },
+        options: {
+            responsive:          true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text:    'Вейбулл-анализ: данные vs теоретическая кривая',
+                    color:   '#6b7280',
+                    font:    { family: 'JetBrains Mono', size: 12 }
+                },
+                legend: {
+                    labels: { color: '#6b7280', font: monoFont }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            if (ctx.datasetIndex === 1) {
+                                return `t=${ctx.parsed.x.toFixed(1)} ${units || ''} · F=${ctx.parsed.y.toFixed(1)}%`;
+                            }
+                            return `F(${ctx.parsed.x.toFixed(1)}) = ${ctx.parsed.y.toFixed(1)}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title:   { display: true, text: xLabel, color: '#6b7280' },
+                    ticks:   { color: '#6b7280', font: monoFont },
+                    grid:    { color: 'rgba(0,0,0,0.05)' },
+                    min:     0
+                },
+                y: {
+                    title:   { display: true, text: 'Вероятность отказа (%)', color: '#6b7280' },
+                    ticks:   {
+                        color: '#6b7280',
+                        font:  monoFont,
+                        callback: (v) => v + '%'
+                    },
+                    grid:    { color: 'rgba(0,0,0,0.05)' },
+                    min:     0,
+                    max:     100
+                }
+            }
+        }
+    });
+}
+
+// ── Обработчик кнопки "Подобрать k и λ" ──
+document.getElementById('fitting-button').addEventListener('click', function() {
+    const raw   = document.getElementById('fitting-data').value;
+    const units = document.getElementById('fitting-units').value.trim();
+    const data  = parseInputData(raw);
+
+    if (data.length < 3) {
+        alert('Введите минимум 3 значения больше нуля');
+        return;
+    }
+
+    // Запускаем алгоритм
+    const { k, lambda, r2, sorted, ranks } = fitWeibull(data);
+
+    // Показываем результаты
+    document.getElementById('fitting-result').classList.remove('d-none');
+    document.getElementById('fitting-k').textContent      = k.toFixed(3);
+    document.getElementById('fitting-lambda').textContent  = lambda.toFixed(2);
+    document.getElementById('fitting-r2').textContent      = r2.toFixed(4);
+    document.getElementById('fitting-n').textContent       = data.length;
+
+    // Интерпретация
+    const { qualityText, qualityIcon, kText } = interpretFitting(k, r2);
+    document.getElementById('fitting-interpretation').innerHTML = `
+        <div class="mb-1">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>${qualityIcon} ${qualityText}</strong>
+        </div>
+        <div class="mt-1 text-secondary">${kText}</div>
+    `;
+
+    // Строим график
+    buildFittingChart(sorted, ranks, k, lambda, units);
+});
+
+// ── Кнопка "Использовать параметры во вкладке Вейбулл" ──
+document.getElementById('fitting-use-params').addEventListener('click', function() {
+    const k      = document.getElementById('fitting-k').textContent;
+    const lambda = document.getElementById('fitting-lambda').textContent;
+    const units  = document.getElementById('fitting-units').value.trim();
+
+    if (k === '—' || lambda === '—') return;
+
+    // Подставляем в поля Вейбулла
+    document.getElementById('shape-param').value = k;
+    document.getElementById('scale-param').value = lambda;
+    if (units) document.getElementById('x-units').value = units;
+
+    // Переключаем на вкладку Вейбулл
+    const weibullBtn = document.querySelector('.app-tabs .nav-link');
+    if (weibullBtn) window.switchTab('weibull', weibullBtn);
+
+    // Прокручиваем вверх
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ── Очистить ──
+document.getElementById('fitting-clear').addEventListener('click', function() {
+    document.getElementById('fitting-data').value       = '';
+    document.getElementById('fitting-units').value      = '';
+    document.getElementById('fitting-cell-range').value = '';
+    document.getElementById('fitting-result').classList.add('d-none');
+    if (fittingChartInstance) {
+        fittingChartInstance.destroy();
+        fittingChartInstance = null;
+    }
+});

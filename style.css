@@ -540,3 +540,10 @@ footer {
     border-radius: 3px;
     flex-shrink: 0;
 }
+
+/* ── Textarea для данных ── */
+textarea.app-input {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+}

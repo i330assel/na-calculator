@@ -140,6 +140,11 @@
                     <i class="bi bi-shield-check me-1"></i> Надёжность R(t)
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link" onclick="switchTab('fitting', this)">
+                    <i class="bi bi-diagram-3 me-1"></i> Анализ данных
+                </button>
+            </li>
         </ul>
         
         <!-- ══ ВКЛАДКА 1: ВЕЙБУЛЛ ══ -->
@@ -407,6 +412,128 @@
                         </button>
                         <button onclick="exportChartCSV('reliability')" class="btn btn-outline-secondary btn-sm font-mono">
                             <i class="bi bi-filetype-csv me-1"></i> Скачать CSV
+                        </button>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ ВКЛАДКА 4: АНАЛИЗ ДАННЫХ ══ -->
+        <div id="tab-fitting" class="d-none">
+            <div class="card app-card mb-4">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark font-mono">05</span>
+                    <span class="fw-semibold">Анализ данных — подбор параметров</span>
+                </div>
+                <div class="card-body">
+        
+                    <p class="text-secondary small mb-4">
+                        Введите времена до отказа — алгоритм автоматически найдёт
+                        параметры <span class="text-accent fw-medium">k</span> и
+                        <span class="text-accent fw-medium">λ</span> распределения Вейбулла.
+                    </p>
+        
+                    <div class="row g-3 mb-3">
+        
+                        <div class="col-lg-8">
+                            <label class="form-label small text-secondary">
+                                Времена до отказа
+                                <span class="text-muted">(через запятую или пробел)</span>
+                            </label>
+                            <textarea id="fitting-data" class="form-control app-input font-mono" rows="4"
+                                placeholder="напр: 120, 340, 280, 890, 560, 445, 670, 230, 780, 510"></textarea>
+                            <div class="param-hint mt-1">
+                                <span class="hint-item">Минимум 3 значения · все числа должны быть больше 0</span>
+                            </div>
+                        </div>
+        
+                        <div class="col-lg-4">
+                            <label class="form-label small text-secondary">
+                                Единицы измерения
+                            </label>
+                            <input type="text" id="fitting-units" class="form-control app-input" placeholder="часы, циклы, км">
+        
+                            <label class="form-label small text-secondary mt-3">
+                                Или загрузить из Excel
+                            </label>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="fitting-cell-range" class="form-control app-input font-mono"
+                                    placeholder="напр. A2:A50">
+                                <button onclick="loadFittingFromExcel()"
+                                    class="btn btn-outline-warning btn-sm font-mono flex-shrink-0">
+                                    <i class="bi bi-download"></i>
+                                </button>
+                            </div>
+                            <div class="param-hint mt-1">
+                                <span class="hint-item">Используется последний загруженный файл</span>
+                            </div>
+                        </div>
+        
+                    </div>
+        
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <button id="fitting-button" class="btn btn-warning font-mono">
+                            <i class="bi bi-diagram-3 me-1"></i> Подобрать k и λ
+                        </button>
+                        <button id="fitting-clear" class="btn btn-outline-secondary font-mono">
+                            <i class="bi bi-x-circle me-1"></i> Очистить
+                        </button>
+                    </div>
+        
+                    <!-- Результаты подбора -->
+                    <div id="fitting-result" class="d-none mb-4">
+        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-label">Параметр формы</div>
+                                    <div class="stat-value" id="fitting-k">—</div>
+                                    <div class="stat-hint">k (beta)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-label">Параметр масштаба</div>
+                                    <div class="stat-value" id="fitting-lambda">—</div>
+                                    <div class="stat-hint">λ (eta)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-label">Качество подбора</div>
+                                    <div class="stat-value" id="fitting-r2">—</div>
+                                    <div class="stat-hint">R²</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-label">Точек данных</div>
+                                    <div class="stat-value" id="fitting-n">—</div>
+                                    <div class="stat-hint">значений</div>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <!-- Интерпретация -->
+                        <div class="hint-box mb-4" id="fitting-interpretation"></div>
+        
+                        <!-- Кнопка использовать параметры -->
+                        <button id="fitting-use-params" class="btn btn-warning font-mono mb-4">
+                            <i class="bi bi-arrow-right-circle me-1"></i>
+                            Использовать k и λ во вкладке Вейбулл
+                        </button>
+        
+                    </div>
+        
+                    <!-- График -->
+                    <div class="chart-box" id="fitting-chart-box" style="height: 420px">
+                        <canvas id="fittingChart"></canvas>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button onclick="exportChartPNG('fittingChart', 'weibull-fitting')"
+                            class="btn btn-outline-secondary btn-sm font-mono">
+                            <i class="bi bi-image me-1"></i> Скачать PNG
                         </button>
                     </div>
         
