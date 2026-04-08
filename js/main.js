@@ -9,7 +9,8 @@ import {
 
 import {
     buildWeibullChart, buildMonteCarloChart,
-    buildReliabilityChart, buildFittingChart
+    buildReliabilityChart, buildFittingChart,
+    buildComparisonChart
 } from './charts.js';
 
 import {
@@ -22,10 +23,11 @@ let weibullChartInstance     = null;
 let monteCarloChartInstance  = null;
 let reliabilityChartInstance = null;
 let fittingChartInstance     = null;
+let comparisonChartInstance = null;
 
 // ── Вкладки ───────────────────────────────────────────────
 window.switchTab = function(tab, btn) {
-    ['weibull', 'monte', 'reliability', 'fitting'].forEach(t => {
+    ['weibull', 'monte', 'reliability', 'fitting', 'comparison'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('d-none');
     });
     document.querySelectorAll('.app-tabs .nav-link').forEach(b => {
@@ -434,3 +436,171 @@ function setStatus(el, type, text) {
     el.textContent = text;
     el.className   = `mt-2 small font-mono ${type}`;
 }
+
+// ── Сравнение распределений ───────────────────────────────
+
+// Взять параметры из вкладки "Анализ данных"
+window.useFromFitting = function(slot) {
+    const k      = document.getElementById('fitting-k').textContent;
+    const lambda = document.getElementById('fitting-lambda').textContent;
+    if (k === '—' || lambda === '—') {
+        alert('Сначала выполните анализ данных');
+        return;
+    }
+    document.getElementById(`comp-${slot}-k`).value      = k;
+    document.getElementById(`comp-${slot}-lambda`).value = lambda;
+};
+
+// Взять параметры из вкладки "Вейбулл"
+window.useFromWeibull = function(slot) {
+    const k      = document.getElementById('shape-param').value;
+    const lambda = document.getElementById('scale-param').value;
+    document.getElementById(`comp-${slot}-k`).value      = k;
+    document.getElementById(`comp-${slot}-lambda`).value = lambda;
+};
+
+document.getElementById('comparison-button').addEventListener('click', function() {
+    const aK      = parseFloat(document.getElementById('comp-a-k').value);
+    const aLambda = parseFloat(document.getElementById('comp-a-lambda').value);
+    const bK      = parseFloat(document.getElementById('comp-b-k').value);
+    const bLambda = parseFloat(document.getElementById('comp-b-lambda').value);
+    const aName   = document.getElementById('comp-a-name').value.trim() || 'Распределение А';
+    const bName   = document.getElementById('comp-b-name').value.trim() || 'Распределение Б';
+    const calcType = document.getElementById('comp-type').value;
+    const units    = document.getElementById('comp-units').value.trim();
+
+    // Валидация
+    if (isNaN(aK) || aK <= 0 || isNaN(aLambda) || aLambda <= 0) {
+        alert('Проверьте параметры распределения А'); return;
+    }
+    if (isNaN(bK) || bK <= 0 || isNaN(bLambda) || bLambda <= 0) {
+        alert('Проверьте параметры распределения Б'); return;
+    }
+
+    const dataA = { k: aK, lambda: aLambda, name: aName };
+    const dataB = { k: bK, lambda: bLambda, name: bName };
+
+    // Строим график
+    comparisonChartInstance = buildComparisonChart(
+        comparisonChartInstance, dataA, dataB, calcType, units
+    );
+
+    // Считаем итоги
+    // MTTF = λ * Γ(1 + 1/k) ≈ λ * (1 + 1/k - 1)! для простоты используем λ
+    // Для сравнения используем λ как характерную жизнь
+    const aB10 = aLambda * Math.pow(-Math.log(0.9), 1 / aK); // время когда 10% откажут
+    const bB10 = bLambda * Math.pow(-Math.log(0.9), 1 / bK);
+
+    const aB50 = aLambda * Math.pow(-Math.log(0.5), 1 / aK); // медиана
+    const bB50 = bLambda * Math.pow(-Math.log(0.5), 1 / bK);
+
+    // Показываем итоги
+    document.getElementById('comparison-summary').classList.remove('d-none');
+    document.getElementById('comp-a-name-display').textContent = aName;
+    document.getElementById('comp-b-name-display').textContent = bName;
+
+    document.getElementById('comp-a-stats').innerHTML = `
+        k = ${aK} · λ = ${aLambda} ${units}<br>
+        B10 = ${aB10.toFixed(1)} ${units}<br>
+        <span class="text-secondary">10% откажут к этому моменту</span><br>
+        Медиана = ${aB50.toFixed(1)} ${units}<br>
+        <span class="text-secondary">50% откажут к этому моменту</span>
+    `;
+
+    document.getElementById('comp-b-stats').innerHTML = `
+        k = ${bK} · λ = ${bLambda} ${units}<br>
+        B10 = ${bB10.toFixed(1)} ${units}<br>
+        <span class="text-secondary">10% откажут к этому моменту</span><br>
+        Медиана = ${bB50.toFixed(1)} ${units}<br>
+        <span class="text-secondary">50% откажут к этому моменту</span>
+    `;
+
+    // Интерпретация
+    const betterB10  = aB10 > bB10 ? aName : bName;
+    const betterLong = aLambda > bLambda ? aName : bName;
+    const worseShort = aB10 < bB10 ? aName : bName;
+
+    document.getElementById('comparison-interpretation').innerHTML = `
+        <i class="bi bi-lightbulb me-2"></i>
+        <strong>${betterB10}</strong> надёжнее в начале срока службы (выше B10).
+        На длинном горизонте лучше <strong>${betterLong}</strong> (выше λ).
+        ${aB10 !== bB10
+            ? `<strong>${worseShort}</strong> имеет больше ранних отказов.`
+            : ''}
+    `;
+});
+
+document.getElementById('comparison-clear').addEventListener('click', function() {
+    document.getElementById('comp-a-name').value   = '';
+    document.getElementById('comp-b-name').value   = '';
+    document.getElementById('comp-a-k').value      = '1.5';
+    document.getElementById('comp-a-lambda').value = '1000';
+    document.getElementById('comp-b-k').value      = '2.5';
+    document.getElementById('comp-b-lambda').value = '1500';
+    document.getElementById('comparison-summary').classList.add('d-none');
+    if (comparisonChartInstance) {
+        comparisonChartInstance.destroy();
+        comparisonChartInstance = null;
+    }
+});
+
+// Экспорт CSV для сравнительного графика
+window.exportChartCSV = function(type) {
+    let chartInstance = null;
+    let headers       = '';
+
+    if (type === 'weibull') {
+        chartInstance = weibullChartInstance;
+        const calcType = document.getElementById('calculation-type').value.toUpperCase();
+        const units    = document.getElementById('x-units').value.trim() || 'x';
+        headers = `${units},${calcType}\n`;
+    } else if (type === 'reliability') {
+        chartInstance = reliabilityChartInstance;
+        const units = document.getElementById('rel-units').value.trim() || 't';
+        headers = `${units},R(t)\n`;
+    } else if (type === 'comparison') {
+        chartInstance = comparisonChartInstance;
+        const units  = document.getElementById('comp-units').value.trim() || 'x';
+        const aName  = document.getElementById('comp-a-name').value.trim() || 'А';
+        const bName  = document.getElementById('comp-b-name').value.trim() || 'Б';
+        headers = `${units},${aName},${bName}\n`;
+
+        if (!chartInstance) { alert('Сначала постройте график'); return; }
+
+        const pointsA = chartInstance.data.datasets[0].data;
+        const pointsB = chartInstance.data.datasets[1].data;
+        const maxLen  = Math.max(pointsA.length, pointsB.length);
+
+        let csv = headers;
+        for (let i = 0; i < maxLen; i++) {
+            const x  = pointsA[i]?.x ?? pointsB[i]?.x ?? '';
+            const yA = pointsA[i]?.y ?? '';
+            const yB = pointsB[i]?.y ?? '';
+            csv += `${x},${yA},${yB}\n`;
+        }
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.download = `comparison-${new Date().toISOString().slice(0,10)}.csv`;
+        link.href     = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        return;
+    }
+
+    if (!chartInstance) { alert('Сначала постройте график'); return; }
+
+    const labels = chartInstance.data.labels;
+    const data   = chartInstance.data.datasets[0].data;
+    let csv      = headers;
+    labels.forEach((label, i) => {
+        csv += `${label},${data[i] !== null ? data[i] : ''}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.download = `${type}-${new Date().toISOString().slice(0,10)}.csv`;
+    link.href     = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+};

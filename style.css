@@ -547,3 +547,46 @@ textarea.app-input {
     min-height: 100px;
     line-height: 1.6;
 }
+
+/* ── Сравнение распределений ── */
+.comparison-block {
+    border: 1px solid var(--border-clr);
+    border-radius: 10px;
+    padding: 1.25rem;
+    height: 100%;
+}
+
+.block-a {
+    border-left: 3px solid #5b6ef5;
+    background: rgba(91, 110, 245, 0.03);
+}
+
+.block-b {
+    border-left: 3px solid #ef4444;
+    background: rgba(239, 68, 68, 0.03);
+}
+
+.comparison-block-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.comparison-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.dot-a {
+    background-color: #5b6ef5;
+}
+
+.dot-b {
+    background-color: #ef4444;
+}

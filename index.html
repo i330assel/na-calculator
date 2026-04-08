@@ -145,6 +145,12 @@
                     <i class="bi bi-diagram-3 me-1"></i> Анализ данных
                 </button>
             </li>
+
+            <li class="nav-item">
+                <button class="nav-link" onclick="switchTab('comparison', this)">
+                    <i class="bi bi-layers me-1"></i> Сравнение
+                </button>
+            </li>
         </ul>
         
         <!-- ══ ВКЛАДКА 1: ВЕЙБУЛЛ ══ -->
@@ -534,6 +540,166 @@
                         <button onclick="exportChartPNG('fittingChart', 'weibull-fitting')"
                             class="btn btn-outline-secondary btn-sm font-mono">
                             <i class="bi bi-image me-1"></i> Скачать PNG
+                        </button>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ ВКЛАДКА 5: СРАВНЕНИЕ РАСПРЕДЕЛЕНИЙ ══ -->
+        <div id="tab-comparison" class="d-none">
+            <div class="card app-card mb-4">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark font-mono">06</span>
+                    <span class="fw-semibold">Сравнение двух распределений</span>
+                </div>
+                <div class="card-body">
+        
+                    <p class="text-secondary small mb-4">
+                        Сравните два распределения Вейбулла на одном графике.
+                        Например: два режима отказа, две детали или два поставщика.
+                    </p>
+        
+                    <div class="row g-4 mb-4">
+        
+                        <!-- Распределение А -->
+                        <div class="col-md-6">
+                            <div class="comparison-block block-a">
+                                <div class="comparison-block-label">
+                                    <span class="comparison-dot dot-a"></span>
+                                    Распределение А
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small text-secondary">Название</label>
+                                    <input type="text" id="comp-a-name" class="form-control app-input"
+                                        placeholder="напр. Подшипник, Узел А">
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label small text-secondary">
+                                            Параметр формы <span class="text-accent">(k)</span>
+                                        </label>
+                                        <input type="number" id="comp-a-k" class="form-control app-input font-mono" value="1.5"
+                                            step="0.1" min="0.01">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small text-secondary">
+                                            Параметр масштаба <span class="text-accent">(λ)</span>
+                                        </label>
+                                        <input type="number" id="comp-a-lambda" class="form-control app-input font-mono"
+                                            value="1000" step="1" min="0.01">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button onclick="useFromFitting('a')" class="btn btn-outline-secondary btn-sm font-mono">
+                                        <i class="bi bi-arrow-down-circle me-1"></i>
+                                        Взять из анализа данных
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+        
+                        <!-- Распределение Б -->
+                        <div class="col-md-6">
+                            <div class="comparison-block block-b">
+                                <div class="comparison-block-label">
+                                    <span class="comparison-dot dot-b"></span>
+                                    Распределение Б
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small text-secondary">Название</label>
+                                    <input type="text" id="comp-b-name" class="form-control app-input"
+                                        placeholder="напр. Уплотнение, Узел Б">
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label class="form-label small text-secondary">
+                                            Параметр формы <span class="text-accent">(k)</span>
+                                        </label>
+                                        <input type="number" id="comp-b-k" class="form-control app-input font-mono" value="2.5"
+                                            step="0.1" min="0.01">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small text-secondary">
+                                            Параметр масштаба <span class="text-accent">(λ)</span>
+                                        </label>
+                                        <input type="number" id="comp-b-lambda" class="form-control app-input font-mono"
+                                            value="1500" step="1" min="0.01">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button onclick="useFromWeibull('b')" class="btn btn-outline-secondary btn-sm font-mono">
+                                        <i class="bi bi-arrow-down-circle me-1"></i>
+                                        Взять из вкладки Вейбулл
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+        
+                    </div>
+        
+                    <!-- Настройки графика -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small text-secondary">Тип графика</label>
+                            <select id="comp-type" class="form-select app-input font-mono">
+                                <option value="sf">SF — Функция надёжности</option>
+                                <option value="cdf">CDF — Вероятность отказа</option>
+                                <option value="pdf">PDF — Плотность вероятности</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-secondary">Единицы измерения</label>
+                            <input type="text" id="comp-units" class="form-control app-input" placeholder="часы, циклы, км">
+                        </div>
+                    </div>
+        
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <button id="comparison-button" class="btn btn-warning font-mono">
+                            <i class="bi bi-layers me-1"></i> Сравнить
+                        </button>
+                        <button id="comparison-clear" class="btn btn-outline-secondary font-mono">
+                            <i class="bi bi-x-circle me-1"></i> Очистить
+                        </button>
+                    </div>
+        
+                    <!-- Итоги сравнения -->
+                    <div id="comparison-summary" class="d-none mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-label">
+                                        <span class="comparison-dot dot-a me-1"></span>
+                                        <span id="comp-a-name-display">А</span>
+                                    </div>
+                                    <div class="font-mono small mt-2" id="comp-a-stats"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-label">
+                                        <span class="comparison-dot dot-b me-1"></span>
+                                        <span id="comp-b-name-display">Б</span>
+                                    </div>
+                                    <div class="font-mono small mt-2" id="comp-b-stats"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hint-box mt-3" id="comparison-interpretation"></div>
+                    </div>
+        
+                    <!-- График -->
+                    <div class="chart-box" style="height: 400px">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <button onclick="exportChartPNG('comparisonChart', 'comparison')"
+                            class="btn btn-outline-secondary btn-sm font-mono">
+                            <i class="bi bi-image me-1"></i> Скачать PNG
+                        </button>
+                        <button onclick="exportChartCSV('comparison')" class="btn btn-outline-secondary btn-sm font-mono">
+                            <i class="bi bi-filetype-csv me-1"></i> Скачать CSV
                         </button>
                     </div>
         

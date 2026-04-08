@@ -275,3 +275,100 @@ export function buildFittingChart(instance, sorted, ranks, k, lambda, units) {
         }
     });
 }
+
+// ── Сравнительный график двух распределений ──────────────
+
+export function buildComparisonChart(instance, dataA, dataB, calcType, units) {
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+    // Строим точки для обоих распределений
+    function buildLine(k, lambda) {
+        const range = Math.max(lambda * 5, dataB.lambda * 5, 5);
+        const step  = range / 150;
+        const points = [];
+        for (let i = 0; i <= 150; i++) {
+            const x = i * step;
+            let y;
+            if (calcType === 'pdf')      y = weibullPdf(x, k, lambda);
+            else if (calcType === 'cdf') y = weibullCdf(x, k, lambda);
+            else                         y = weibullSf(x, k, lambda);
+            if (!isNaN(y) && isFinite(y) && y >= 0) {
+                points.push({ x: parseFloat(x.toFixed(2)), y });
+            }
+        }
+        return points;
+    }
+
+    const pointsA = buildLine(dataA.k, dataA.lambda);
+    const pointsB = buildLine(dataB.k, dataB.lambda);
+
+    const yLabels = {
+        pdf: 'Плотность вероятности',
+        cdf: 'Вероятность отказа (0–1)',
+        sf:  'Вероятность выживания (0–1)'
+    };
+
+    const titles = {
+        pdf: 'Сравнение PDF',
+        cdf: 'Сравнение CDF',
+        sf:  'Сравнение функций надёжности SF'
+    };
+
+    if (instance) instance.destroy();
+
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label:           `${dataA.name} (k=${dataA.k}, λ=${dataA.lambda})`,
+                    data:            pointsA,
+                    borderColor:     '#5b6ef5',
+                    backgroundColor: 'rgba(91,110,245,0.08)',
+                    fill:            calcType === 'sf',
+                    tension:         0.3,
+                    pointRadius:     0,
+                    borderWidth:     2.5
+                },
+                {
+                    label:           `${dataB.name} (k=${dataB.k}, λ=${dataB.lambda})`,
+                    data:            pointsB,
+                    borderColor:     '#ef4444',
+                    backgroundColor: 'rgba(239,68,68,0.08)',
+                    fill:            calcType === 'sf',
+                    tension:         0.3,
+                    pointRadius:     0,
+                    borderWidth:     2.5,
+                    borderDash:      [6, 3]
+                }
+            ]
+        },
+        options: {
+            responsive:          true,
+            maintainAspectRatio: false,
+            parsing: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text:    titles[calcType],
+                    color:   CHART_STYLE.color,
+                    font:    CHART_STYLE.titleFont
+                },
+                legend: {
+                    labels: { color: CHART_STYLE.color, font: CHART_STYLE.font }
+                }
+            },
+            scales: {
+                x: {
+                    type:  'linear',
+                    ...axisConfig(units || 'время'),
+                    min:   0
+                },
+                y: {
+                    ...axisConfig(yLabels[calcType]),
+                    min: 0
+                }
+            }
+        }
+    });
+}
