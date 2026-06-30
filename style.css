@@ -590,3 +590,9 @@ textarea.app-input {
 .dot-b {
     background-color: #ef4444;
 }
+
+.lang-btn.active {
+    background-color: var(--accent) !important;
+    color: #ffffff !important;
+    border-color: var(--accent) !important;
+}

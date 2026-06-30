@@ -1,0 +1,47 @@
+{
+  "nav.title": "Calculation and Analysis Tool",
+  "nav.logout": "Выйти",
+
+  "hero.label": "Инструмент анализа надёжности",
+  "hero.title": "Распределение Вейбулла",
+  "hero.subtitle": "PDF · CDF · SF · Метод Монте-Карло · Загрузка Excel",
+
+  "tab.weibull": "Вейбулл",
+  "tab.monte": "Монте-Карло",
+  "tab.reliability": "Надёжность R(t)",
+  "tab.fitting": "Анализ данных",
+  "tab.comparison": "Сравнение",
+
+  "weibull.cardTitle": "Параметры и расчёт",
+  "weibull.units": "Единицы измерения",
+  "weibull.unitsHint": "(для подписи графика)",
+  "weibull.unitsPlaceholder": "напр. часы, циклы, км",
+
+  "weibull.shapeParam": "Параметр формы",
+  "weibull.shapeHint1": "k < 1 — ранние отказы",
+  "weibull.shapeHint2": "k = 1 — случайные отказы",
+  "weibull.shapeHint3": "k > 1 — износ со временем",
+
+  "weibull.scaleParam": "Параметр масштаба",
+  "weibull.scaleHint1": "Характерный срок службы",
+  "weibull.scaleHint2": "≈ 63% изделий откажут к λ",
+
+  "weibull.xValue": "Значение x",
+  "weibull.optional": "необязательно",
+  "weibull.xHint1": "Конкретный момент времени",
+  "weibull.xHint2": "Для точного числового результата",
+
+  "weibull.calcType": "Тип расчёта",
+  "weibull.calcTypePdf": "PDF — Плотность вероятности",
+  "weibull.calcTypeCdf": "CDF — Вероятность отказа",
+  "weibull.calcTypeSf": "SF — Вероятность выживания",
+
+  "weibull.calculate": "Рассчитать",
+  "weibull.clear": "Очистить всё",
+
+  "weibull.resultLabel": "Результат для x =",
+  "weibull.noXHint": "Введите значение x чтобы получить точный числовой результат",
+
+  "weibull.downloadPng": "Скачать PNG",
+  "weibull.downloadCsv": "Скачать CSV"
+}

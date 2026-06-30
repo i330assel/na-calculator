@@ -1,0 +1,47 @@
+{
+  "nav.title": "Calculation and Analysis Tool",
+  "nav.logout": "Log out",
+
+  "hero.label": "Reliability Analysis Tool",
+  "hero.title": "Weibull Distribution",
+  "hero.subtitle": "PDF · CDF · SF · Monte Carlo Method · Excel Upload",
+
+  "tab.weibull": "Weibull",
+  "tab.monte": "Monte Carlo",
+  "tab.reliability": "Reliability R(t)",
+  "tab.fitting": "Data Fitting",
+  "tab.comparison": "Comparison",
+
+  "weibull.cardTitle": "Parameters & Calculation",
+  "weibull.units": "Units",
+  "weibull.unitsHint": "(used as chart axis label)",
+  "weibull.unitsPlaceholder": "e.g. hours, cycles, km",
+
+  "weibull.shapeParam": "Shape parameter",
+  "weibull.shapeHint1": "k < 1 — early failures",
+  "weibull.shapeHint2": "k = 1 — random failures",
+  "weibull.shapeHint3": "k > 1 — wear over time",
+
+  "weibull.scaleParam": "Scale parameter",
+  "weibull.scaleHint1": "Characteristic life",
+  "weibull.scaleHint2": "≈ 63% of units fail by λ",
+
+  "weibull.xValue": "X value",
+  "weibull.optional": "optional",
+  "weibull.xHint1": "A specific point in time",
+  "weibull.xHint2": "For an exact numeric result",
+
+  "weibull.calcType": "Calculation type",
+  "weibull.calcTypePdf": "PDF — Probability density",
+  "weibull.calcTypeCdf": "CDF — Failure probability",
+  "weibull.calcTypeSf": "SF — Survival probability",
+
+  "weibull.calculate": "Calculate",
+  "weibull.clear": "Clear all",
+
+  "weibull.resultLabel": "Result for x =",
+  "weibull.noXHint": "Enter a value for x to get an exact numeric result",
+
+  "weibull.downloadPng": "Download PNG",
+  "weibull.downloadCsv": "Download CSV"
+}
