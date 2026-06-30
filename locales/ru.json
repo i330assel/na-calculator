@@ -167,5 +167,14 @@
   "chart.compPdfTitle": "Сравнение PDF",
   "chart.compCdfTitle": "Сравнение CDF",
   "chart.compSfTitle": "Сравнение функций надёжности SF",
-  "chart.compDefaultUnit": "время"
+  "chart.compDefaultUnit": "время",
+
+  "history.empty": "Нет сохранённых расчётов",
+  "history.noName": "Без названия",
+  "history.sectionWeibull": "Вейбулл",
+  "history.sectionMonte": "Монте-Карло",
+  "history.sectionReliability": "Надёжность",
+  "history.mean": "среднее",
+  "history.open": "Открыть",
+  "history.confirmDelete": "Удалить этот расчёт?"
 }

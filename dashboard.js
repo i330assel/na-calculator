@@ -1,6 +1,5 @@
-// dashboard.js
-
 import { supabase } from './supabase.js'
+import { t } from './js/i18n.js'
 
 let currentUser = null
 
@@ -201,7 +200,7 @@ function renderCalculations(items) {
         container.innerHTML = `
             <div class="text-center text-secondary py-4">
                 <i class="bi bi-inbox fs-3 d-block mb-2 opacity-50"></i>
-                <p class="small mb-0">Нет сохранённых расчётов</p>
+                <p class="small mb-0">${t('history.empty')}</p>
             </div>`
         return
     }
@@ -213,7 +212,7 @@ function renderCalculations(items) {
         if (item.k && item.lambda) {
             weibullLine = `
                 <div class="calc-section">
-                    <span class="calc-section-label">Вейбулл</span>
+                    <span class="calc-section-label">${t('history.sectionWeibull')}</span>
                     k=${item.k} · λ=${item.lambda} · ${(item.calc_type || '').toUpperCase()}
                     ${item.x_units ? `· ${item.x_units}` : ''}
                     ${item.x !== null && item.x !== undefined
@@ -228,10 +227,10 @@ function renderCalculations(items) {
         if (item.mc_samples) {
             monteLine = `
                 <div class="calc-section">
-                    <span class="calc-section-label">Монте-Карло</span>
+                    <span class="calc-section-label">${t('history.sectionMonte')}</span>
                     N=${item.mc_samples}
                     ${item.mc_mean !== null && item.mc_mean !== undefined
-                        ? `· среднее=<strong>${Number(item.mc_mean).toFixed(2)}</strong>` : ''}
+                        ? `· ${t('history.mean')}=<strong>${Number(item.mc_mean).toFixed(2)}</strong>` : ''}
                     ${item.mc_std !== null && item.mc_std !== undefined
                         ? `· σ=${Number(item.mc_std).toFixed(2)}` : ''}
                 </div>`
@@ -242,7 +241,7 @@ function renderCalculations(items) {
         if (item.rel_lambda) {
             reliabilityLine = `
                 <div class="calc-section">
-                    <span class="calc-section-label">Надёжность</span>
+                    <span class="calc-section-label">${t('history.sectionReliability')}</span>
                     λ=${item.rel_lambda}
                     ${item.rel_mtbf !== null && item.rel_mtbf !== undefined
                         ? `· MTBF=<strong>${Number(item.rel_mtbf).toFixed(1)}</strong>
@@ -258,10 +257,10 @@ function renderCalculations(items) {
                     <div class="flex-grow-1">
                         <div class="calc-item-name">
                             <i class="bi bi-calculator me-2 opacity-50"></i>
-                            ${item.name || 'Без названия'}
+                            ${item.name || t('history.noName')}
                         </div>
                         <div class="calc-item-date">
-                            ${new Date(item.created_at).toLocaleString('ru-RU')}
+                            ${new Date(item.created_at).toLocaleString()}
                         </div>
                         <div class="calc-details mt-2">
                             ${weibullLine}
@@ -273,7 +272,7 @@ function renderCalculations(items) {
                         <button
                             onclick="window.openCalc(${JSON.stringify(item).replace(/"/g, '&quot;')})"
                             class="btn btn-sm btn-outline-warning font-mono">
-                            <i class="bi bi-arrow-up-right-circle"></i> Открыть
+                            <i class="bi bi-arrow-up-right-circle"></i> ${t('history.open')}
                         </button>
                         <button
                             onclick="window.deleteCalc('${item.id}')"
@@ -288,7 +287,7 @@ function renderCalculations(items) {
 
 // Глобальные функции
 window.deleteCalc = async function(id) {
-    if (confirm('Удалить этот расчёт?')) {
+    if (confirm(t('history.confirmDelete'))) {
         await deleteCalculation(id)
     }
 }

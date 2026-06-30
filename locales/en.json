@@ -167,5 +167,14 @@
   "chart.compPdfTitle": "PDF Comparison",
   "chart.compCdfTitle": "CDF Comparison",
   "chart.compSfTitle": "Reliability (SF) Comparison",
-  "chart.compDefaultUnit": "time"
+  "chart.compDefaultUnit": "time",
+
+  "history.empty": "No saved calculations",
+  "history.noName": "Untitled",
+  "history.sectionWeibull": "Weibull",
+  "history.sectionMonte": "Monte Carlo",
+  "history.sectionReliability": "Reliability",
+  "history.mean": "mean",
+  "history.open": "Open",
+  "history.confirmDelete": "Delete this calculation?"
 }
