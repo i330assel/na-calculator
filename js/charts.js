@@ -2,6 +2,8 @@ import {
     weibullPdf, weibullCdf, weibullSf
 } from './weibull-math.js';
 
+import { t } from './i18n.js';
+
 // ── Общие настройки для всех графиков
 const CHART_STYLE = {
     font:      { family: 'JetBrains Mono', size: 11 },
@@ -10,7 +12,6 @@ const CHART_STYLE = {
     titleFont: { family: 'JetBrains Mono', size: 12 }
 };
 
-// Вспомогательная функция для настроек оси
 function axisConfig(title) {
     return {
         title: { display: true, text: title, color: CHART_STYLE.color },
@@ -48,14 +49,14 @@ export function buildWeibullChart(instance, k, lambda, calcType, xUnits) {
     }
 
     const yLabels = {
-        pdf: 'Плотность вероятности',
-        cdf: 'Вероятность отказа (0–1)',
-        sf:  'Вероятность выживания (0–1)'
+        pdf: t('chart.pdfYLabel'),
+        cdf: t('chart.cdfYLabel'),
+        sf:  t('chart.sfYLabel')
     };
     const titles = {
-        pdf: 'PDF — Плотность вероятности отказа',
-        cdf: 'CDF — Накопленная вероятность отказа',
-        sf:  'SF — Функция надёжности'
+        pdf: t('chart.pdfTitle'),
+        cdf: t('chart.cdfTitle'),
+        sf:  t('chart.sfTitle')
     };
 
     const chartLabel = `Weibull ${calcType.toUpperCase()} (k=${k.toFixed(2)}, λ=${lambda.toFixed(2)})`;
@@ -66,7 +67,7 @@ export function buildWeibullChart(instance, k, lambda, calcType, xUnits) {
         instance.data.datasets[0].label      = chartLabel;
         instance.options.scales.y.max        = yMax * 1.1;
         instance.options.plugins.title.text  = titles[calcType];
-        instance.options.scales.x.title.text = xUnits || 'x';
+        instance.options.scales.x.title.text = xUnits || t('chart.defaultXUnit');
         instance.options.scales.y.title.text = yLabels[calcType];
         instance.update();
         return instance;
@@ -95,7 +96,7 @@ export function buildWeibullChart(instance, k, lambda, calcType, xUnits) {
                 legend: { labels: { color: CHART_STYLE.color, font: CHART_STYLE.font } }
             },
             scales: {
-                x: { ...axisConfig(xUnits || 'x'), min: 0 },
+                x: { ...axisConfig(xUnits || t('chart.defaultXUnit')), min: 0 },
                 y: { ...axisConfig(yLabels[calcType]), max: yMax * 1.1 }
             }
         }
@@ -113,7 +114,7 @@ export function buildMonteCarloChart(instance, mcData, k, lambda, numSamples, xU
         data: {
             labels: mcData.binLabels,
             datasets: [{
-                label:           'Частота',
+                label:           t('chart.mcFrequency'),
                 data:            mcData.histogram,
                 backgroundColor: 'rgba(56,189,248,0.55)',
                 borderColor:     'rgba(56,189,248,0.9)',
@@ -126,16 +127,16 @@ export function buildMonteCarloChart(instance, mcData, k, lambda, numSamples, xU
             plugins: {
                 title: {
                     display: true,
-                    text:    `Монте-Карло (k=${k.toFixed(2)}, λ=${lambda.toFixed(2)}, N=${numSamples})`,
+                    text:    `${t('chart.mcTitle')} (k=${k.toFixed(2)}, λ=${lambda.toFixed(2)}, N=${numSamples})`,
                     color:   CHART_STYLE.color,
                     font:    CHART_STYLE.titleFont
                 },
                 legend:  { labels: { color: CHART_STYLE.color, font: CHART_STYLE.font } },
-                tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y} раз(а)` } }
+                tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y} ${t('chart.mcTooltipTimes')}` } }
             },
             scales: {
-                x: axisConfig(xUnits || 'Значение выборки'),
-                y: { ...axisConfig('Количество'), beginAtZero: true }
+                x: axisConfig(xUnits || t('chart.mcDefaultXUnit')),
+                y: { ...axisConfig(t('chart.mcYLabel')), beginAtZero: true }
             }
         }
     });
@@ -153,9 +154,9 @@ export function buildReliabilityChart(instance, lambda, units, tMark) {
     const data   = [];
 
     for (let i = 0; i <= 100; i++) {
-        const t = i * step;
-        labels.push(t.toFixed(1));
-        data.push(Math.exp(-lambda * t));
+        const tt = i * step;
+        labels.push(tt.toFixed(1));
+        data.push(Math.exp(-lambda * tt));
     }
 
     if (instance) instance.destroy();
@@ -179,13 +180,13 @@ export function buildReliabilityChart(instance, lambda, units, tMark) {
             responsive:          true,
             maintainAspectRatio: false,
             plugins: {
-                title:  { display: true, text: 'Функция надёжности R(t) = e^(-λt)', color: CHART_STYLE.color, font: CHART_STYLE.titleFont },
+                title:  { display: true, text: t('chart.relTitle'), color: CHART_STYLE.color, font: CHART_STYLE.titleFont },
                 legend: { labels: { color: CHART_STYLE.color, font: CHART_STYLE.font } }
             },
             scales: {
-                x: axisConfig(units || 'время'),
+                x: axisConfig(units || t('chart.relDefaultUnit')),
                 y: {
-                    ...axisConfig('Вероятность выживания'),
+                    ...axisConfig(t('chart.relYLabel')),
                     min: 0,
                     max: 1,
                     ticks: {
@@ -223,7 +224,7 @@ export function buildFittingChart(instance, sorted, ranks, k, lambda, units) {
         data: {
             datasets: [
                 {
-                    label:           `Вейбулл CDF (k=${k.toFixed(2)}, λ=${lambda.toFixed(1)})`,
+                    label:           `${t('chart.fittingCdfLegend')} (k=${k.toFixed(2)}, λ=${lambda.toFixed(1)})`,
                     data:            linePoints,
                     type:            'line',
                     borderColor:     '#5b6ef5',
@@ -235,7 +236,7 @@ export function buildFittingChart(instance, sorted, ranks, k, lambda, units) {
                     order:           2
                 },
                 {
-                    label:            'Данные об отказах',
+                    label:            t('chart.fittingDataLegend'),
                     data:             scatterPoints,
                     backgroundColor:  '#ef4444',
                     borderColor:      '#ef4444',
@@ -249,7 +250,7 @@ export function buildFittingChart(instance, sorted, ranks, k, lambda, units) {
             responsive:          true,
             maintainAspectRatio: false,
             plugins: {
-                title:  { display: true, text: 'Вейбулл-анализ: данные vs теоретическая кривая', color: CHART_STYLE.color, font: CHART_STYLE.titleFont },
+                title:  { display: true, text: t('chart.fittingTitle'), color: CHART_STYLE.color, font: CHART_STYLE.titleFont },
                 legend: { labels: { color: CHART_STYLE.color, font: CHART_STYLE.font } },
                 tooltip: {
                     callbacks: {
@@ -260,9 +261,9 @@ export function buildFittingChart(instance, sorted, ranks, k, lambda, units) {
                 }
             },
             scales: {
-                x: { ...axisConfig(units || 'Время до отказа'), min: 0 },
+                x: { ...axisConfig(units || t('chart.fittingDefaultXUnit')), min: 0 },
                 y: {
-                    ...axisConfig('Вероятность отказа (%)'),
+                    ...axisConfig(t('chart.fittingYLabel')),
                     min: 0,
                     max: 100,
                     ticks: {
@@ -281,7 +282,6 @@ export function buildFittingChart(instance, sorted, ranks, k, lambda, units) {
 export function buildComparisonChart(instance, dataA, dataB, calcType, units) {
     const ctx = document.getElementById('comparisonChart').getContext('2d');
 
-    // Строим точки для обоих распределений
     function buildLine(k, lambda) {
         const range = Math.max(lambda * 5, dataB.lambda * 5, 5);
         const step  = range / 150;
@@ -303,15 +303,15 @@ export function buildComparisonChart(instance, dataA, dataB, calcType, units) {
     const pointsB = buildLine(dataB.k, dataB.lambda);
 
     const yLabels = {
-        pdf: 'Плотность вероятности',
-        cdf: 'Вероятность отказа (0–1)',
-        sf:  'Вероятность выживания (0–1)'
+        pdf: t('chart.pdfYLabel'),
+        cdf: t('chart.cdfYLabel'),
+        sf:  t('chart.sfYLabel')
     };
 
     const titles = {
-        pdf: 'Сравнение PDF',
-        cdf: 'Сравнение CDF',
-        sf:  'Сравнение функций надёжности SF'
+        pdf: t('chart.compPdfTitle'),
+        cdf: t('chart.compCdfTitle'),
+        sf:  t('chart.compSfTitle')
     };
 
     if (instance) instance.destroy();
@@ -361,7 +361,7 @@ export function buildComparisonChart(instance, dataA, dataB, calcType, units) {
             scales: {
                 x: {
                     type:  'linear',
-                    ...axisConfig(units || 'время'),
+                    ...axisConfig(units || t('chart.compDefaultUnit')),
                     min:   0
                 },
                 y: {

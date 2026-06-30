@@ -44,3 +44,7 @@ export async function initI18n() {
     await loadTranslations(currentLang);
     applyTranslations();
 }
+
+export function t(key) {
+    return translations[key] !== undefined ? translations[key] : key;
+}

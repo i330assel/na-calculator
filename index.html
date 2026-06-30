@@ -56,75 +56,75 @@
         <div class="card app-card mb-4">
             <div class="card-header d-flex align-items-center gap-2">
                 <span class="badge bg-warning text-dark font-mono">01</span>
-                <span class="fw-semibold">Загрузка данных из Excel</span>
+                <span class="fw-semibold" data-i18n="excel.cardTitle">Загрузка данных из Excel</span>
             </div>
             <div class="card-body">
-
+        
                 <p class="text-secondary small mb-3">
-                    Загрузите <code>.xlsx</code> файл и укажите адреса ячеек.<br>
-                    Форматы: одна ячейка — <code>A1</code>, диапазон — <code>A2:A50</code>
+                    <span data-i18n="excel.desc1">Загрузите</span> <code>.xlsx</code> <span data-i18n="excel.desc2">файл и
+                        укажите адреса ячеек.</span><br>
+                    <span data-i18n="excel.descFormats">Форматы: одна ячейка — A1, диапазон — A2:A50</span>
                 </p>
-
+        
                 <!-- Зона загрузки -->
                 <div class="upload-zone mb-3" id="uploadZone">
                     <i class="bi bi-cloud-upload fs-2 text-secondary mb-2 d-block"></i>
-                    <p class="mb-1 fw-medium">Перетащите .xlsx файл сюда</p>
-                    <p class="text-secondary small mb-3">или</p>
+                    <p class="mb-1 fw-medium" data-i18n="excel.dropText">Перетащите .xlsx файл сюда</p>
+                    <p class="text-secondary small mb-3" data-i18n="excel.or">или</p>
                     <label for="excelFile" class="btn btn-outline-warning btn-sm font-mono">
-                        <i class="bi bi-folder2-open me-1"></i> Выбрать файл
+                        <i class="bi bi-folder2-open me-1"></i> <span data-i18n="excel.chooseFile">Выбрать файл</span>
                     </label>
                     <input type="file" id="excelFile" accept=".xlsx,.xls" class="d-none">
                     <div id="fileName" class="mt-2 small font-mono text-info"></div>
                 </div>
-
+        
                 <!-- Превью таблицы -->
                 <div id="previewSection" class="d-none mb-3">
                     <p class="text-secondary small text-uppercase font-mono ls-wide mb-2">
-                        <i class="bi bi-table me-1"></i> Превью (первые 10 строк):
+                        <i class="bi bi-table me-1"></i> <span data-i18n="excel.previewLabel">Превью (первые 10 строк):</span>
                     </p>
                     <div class="table-responsive rounded border border-secondary">
                         <table id="previewTable"
                             class="table table-dark table-sm table-bordered table-hover mb-0 font-mono small"></table>
                     </div>
                 </div>
-
+        
                 <!-- Маппинг ячеек -->
                 <div id="mappingSection" class="d-none">
                     <p class="text-secondary small text-uppercase font-mono ls-wide mb-3">
-                        <i class="bi bi-cursor-text me-1"></i> Укажите ячейки с данными:
+                        <i class="bi bi-cursor-text me-1"></i> <span data-i18n="excel.mappingLabel">Укажите ячейки с
+                            данными:</span>
                     </p>
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <label class="form-label small text-secondary">
-                                Параметр формы <span class="text-warning">k</span>
-                                <span class="text-muted">(одна ячейка)</span>
+                                <span data-i18n="excel.cellK">Параметр формы</span> <span class="text-warning">k</span>
+                                <span class="text-muted" data-i18n="excel.cellKHint">(одна ячейка)</span>
                             </label>
-                            <input type="text" id="cell-k" class="form-control app-input font-mono"
-                                placeholder="напр. A1">
+                            <input type="text" id="cell-k" class="form-control app-input font-mono" placeholder="напр. A1">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small text-secondary">
-                                Параметр масштаба <span class="text-warning">λ</span>
-                                <span class="text-muted">(одна ячейка)</span>
+                                <span data-i18n="excel.cellLambda">Параметр масштаба</span> <span class="text-warning">λ</span>
+                                <span class="text-muted" data-i18n="excel.cellLambdaHint">(одна ячейка)</span>
                             </label>
-                            <input type="text" id="cell-lambda" class="form-control app-input font-mono"
-                                placeholder="напр. B1">
+                            <input type="text" id="cell-lambda" class="form-control app-input font-mono" placeholder="напр. B1">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label small text-secondary">
-                                Значение <span class="text-warning">x</span>
-                                <span class="text-muted">(ячейка или диапазон)</span>
+                                <span data-i18n="excel.cellX">Значение</span> <span class="text-warning">x</span>
+                                <span class="text-muted" data-i18n="excel.cellXHint">(ячейка или диапазон)</span>
                             </label>
                             <input type="text" id="cell-x" class="form-control app-input font-mono"
                                 placeholder="напр. C2 или C2:C50">
                         </div>
                     </div>
                     <button id="load-from-excel" class="btn btn-warning font-mono btn-sm">
-                        <i class="bi bi-download me-1"></i> Загрузить данные из файла
+                        <i class="bi bi-download me-1"></i> <span data-i18n="excel.loadButton">Загрузить данные из файла</span>
                     </button>
                     <div id="excel-status" class="mt-2 small font-mono"></div>
                 </div>
-
+        
             </div>
         </div>
 
@@ -158,7 +158,7 @@
             </li>
         </ul>
 
-        
+
         <!-- ══ ВКЛАДКА 1: ВЕЙБУЛЛ ══ -->
         <div id="tab-weibull">
             <div class="card app-card mb-4">
@@ -286,33 +286,33 @@
             <div class="card app-card mb-4">
                 <div class="card-header d-flex align-items-center gap-2">
                     <span class="badge bg-warning text-dark font-mono">03</span>
-                    <span class="fw-semibold">Метод Монте-Карло</span>
+                    <span class="fw-semibold" data-i18n="monte.cardTitle">Метод Монте-Карло</span>
                 </div>
                 <div class="card-body">
         
-                    <p class="text-secondary small mb-3">
-                        Использует параметры <span class="text-accent fw-medium">k</span> и
-                        <span class="text-accent fw-medium">λ</span> из вкладки Вейбулл.
-                        Генерирует случайные выборки и строит гистограмму распределения.
+                    <p class="text-secondary small mb-3" data-i18n="monte.desc1">
+                        Использует параметры <span class="text-accent fw-medium">k</span> <span data-i18n="monte.desc2">и</span>
+                        <span class="text-accent fw-medium">λ</span> <span data-i18n="monte.desc3">из вкладки Вейбулл.
+                        Генерирует случайные выборки и строит гистограмму распределения.</span>
                     </p>
         
                     <div class="row g-3 mb-2">
                         <div class="col-sm-6 col-md-4 col-lg-3">
-                            <label class="form-label small text-secondary">
+                            <label class="form-label small text-secondary" data-i18n="monte.samples">
                                 Количество выборок <span class="text-accent">(N)</span>
                             </label>
                             <input type="number" id="monte-carlo-samples" value="1000" min="1"
                                 class="form-control app-input font-mono">
                             <div class="param-hint mt-1">
-                                <span class="hint-item">1 000 — быстро</span>
-                                <span class="hint-item">10 000 — точнее</span>
-                                <span class="hint-item">100 000 — максимальная точность</span>
+                                <span class="hint-item" data-i18n="monte.hint1">1 000 — быстро</span>
+                                <span class="hint-item" data-i18n="monte.hint2">10 000 — точнее</span>
+                                <span class="hint-item" data-i18n="monte.hint3">100 000 — максимальная точность</span>
                             </div>
                         </div>
                     </div>
         
                     <button id="monte-carlo-button" class="btn btn-warning font-mono mt-3 mb-4">
-                        <i class="bi bi-shuffle me-1"></i> Запустить симуляцию
+                        <i class="bi bi-shuffle me-1"></i> <span data-i18n="monte.runButton">Запустить симуляцию</span>
                     </button>
         
                     <div id="mc-result-area" class="d-none mb-4">
@@ -328,7 +328,7 @@
                     <div class="d-flex gap-2 mt-2">
                         <button onclick="exportChartPNG('monteCarloChart', 'monte-carlo')"
                             class="btn btn-outline-secondary btn-sm font-mono">
-                            <i class="bi bi-image me-1"></i> Скачать PNG
+                            <i class="bi bi-image me-1"></i> <span data-i18n="monte.downloadPng">Скачать PNG</span>
                         </button>
                     </div>
         
@@ -341,11 +341,11 @@
             <div class="card app-card mb-4">
                 <div class="card-header d-flex align-items-center gap-2">
                     <span class="badge bg-warning text-dark font-mono">04</span>
-                    <span class="fw-semibold">Надёжность R(t) и MTBF</span>
+                    <span class="fw-semibold" data-i18n="rel.cardTitle">Надёжность R(t) и MTBF</span>
                 </div>
                 <div class="card-body">
         
-                    <p class="text-secondary small mb-4">
+                    <p class="text-secondary small mb-4" data-i18n="rel.desc">
                         Экспоненциальная модель надёжности для случайных отказов (k = 1).
                         Применяется для восстанавливаемых систем и электронных компонентов.
                     </p>
@@ -353,42 +353,44 @@
                     <div class="row g-3 mb-2">
         
                         <div class="col-sm-6 col-lg-3">
-                            <label class="form-label small text-secondary">
+                            <label class="form-label small text-secondary" data-i18n="rel.lambda">
                                 Интенсивность отказов <span class="text-accent">(λ)</span>
                             </label>
                             <input type="number" id="rel-lambda" value="0.001" step="0.0001" min="0.000001"
                                 class="form-control app-input font-mono">
                             <div class="param-hint mt-1">
-                                <span class="hint-item">Отказов в единицу времени</span>
-                                <span class="hint-item">0.001 = 1 отказ / 1000 часов</span>
+                                <span class="hint-item" data-i18n="rel.lambdaHint1">Отказов в единицу времени</span>
+                                <span class="hint-item" data-i18n="rel.lambdaHint2">0.001 = 1 отказ / 1000 часов</span>
                             </div>
                         </div>
         
                         <div class="col-sm-6 col-lg-3">
-                            <label class="form-label small text-secondary">
+                            <label class="form-label small text-secondary" data-i18n="rel.t">
                                 Момент времени <span class="text-accent">(t)</span>
-                                <span class="badge bg-secondary ms-1" style="font-size:0.6rem">необязательно</span>
+                                <span class="badge bg-secondary ms-1" style="font-size:0.6rem" data-i18n="weibull.optional">необязательно</span>
                             </label>
                             <input type="number" id="rel-t" step="1" min="0" class="form-control app-input font-mono"
                                 placeholder="—">
                             <div class="param-hint mt-1">
-                                <span class="hint-item">Для расчёта R(t) в конкретной точке</span>
+                                <span class="hint-item" data-i18n="rel.tHint">Для расчёта R(t) в конкретной точке</span>
                             </div>
                         </div>
         
                         <div class="col-sm-6 col-lg-3">
-                            <label class="form-label small text-secondary">Единицы времени</label>
-                            <input type="text" id="rel-units" class="form-control app-input" placeholder="часы, циклы, км">
+                            <label class="form-label small text-secondary" data-i18n="rel.units">Единицы времени</label>
+                            <input type="text" id="rel-units" class="form-control app-input" placeholder="часы, циклы, км/hours, cycles, km">
                         </div>
         
                     </div>
         
                     <div class="d-flex flex-wrap gap-2 mt-3 mb-4">
                         <button id="reliability-button" class="btn btn-warning font-mono">
-                            <i class="bi bi-calculator me-1"></i> Рассчитать
+                            <i class="bi bi-calculator me-1"></i> 
+                            <span data-i18n="rel.calculate">Рассчитать</span>
                         </button>
                         <button id="reliability-clear" class="btn btn-outline-secondary font-mono">
-                            <i class="bi bi-x-circle me-1"></i> Очистить
+                            <i class="bi bi-x-circle me-1"></i> 
+                            <span data-i18n="rel.clear">Очистить</span>
                         </button>
                     </div>
         
@@ -396,23 +398,23 @@
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
                                 <div class="stat-card">
-                                    <div class="stat-label">MTBF</div>
+                                    <div class="stat-label" data-i18n="rel.mtbfLabel">MTBF</div>
                                     <div class="stat-value" id="rel-mtbf">—</div>
-                                    <div class="stat-hint">Среднее время между отказами</div>
+                                    <div class="stat-hint" data-i18n="rel.mtbfHint">Среднее время между отказами</div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="stat-card">
-                                    <div class="stat-label">R(t) — выживаемость</div>
+                                    <div class="stat-label" data-i18n="rel.rtLabel">R(t) — выживаемость</div>
                                     <div class="stat-value" id="rel-rt">—</div>
-                                    <div class="stat-hint" id="rel-rt-hint">Вероятность выживания</div>
+                                    <div class="stat-hint" id="rel-rt-hint" data-i18n="rel.rtHint">Вероятность выживания</div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="stat-card">
-                                    <div class="stat-label">F(t) — вероятность отказа</div>
+                                    <div class="stat-label" data-i18n="rel.ftLabel">F(t) — вероятность отказа</div>
                                     <div class="stat-value" id="rel-ft">—</div>
-                                    <div class="stat-hint" id="rel-ft-hint">Вероятность отказа до t</div>
+                                    <div class="stat-hint" id="rel-ft-hint" data-i18n="rel.ftHint">Вероятность отказа до t</div>
                                 </div>
                             </div>
                         </div>
@@ -428,7 +430,9 @@
                             <i class="bi bi-image me-1"></i> Скачать PNG
                         </button>
                         <button onclick="exportChartCSV('reliability')" class="btn btn-outline-secondary btn-sm font-mono">
-                            <i class="bi bi-filetype-csv me-1"></i> Скачать CSV
+                            <i class="bi bi-filetype-csv me-1"></i> 
+                            <span data-i18n="rel.downloadPng">Скачать PNG</span>
+                            <span data-i18n="rel.downloadCsv">Скачать CSV</span>
                         </button>
                     </div>
         
@@ -441,37 +445,40 @@
             <div class="card app-card mb-4">
                 <div class="card-header d-flex align-items-center gap-2">
                     <span class="badge bg-warning text-dark font-mono">05</span>
-                    <span class="fw-semibold">Анализ данных — подбор параметров</span>
+                    <span class="fw-semibold" data-i18n="fitting.cardTitle">Анализ данных — подбор параметров</span>
                 </div>
                 <div class="card-body">
         
                     <p class="text-secondary small mb-4">
-                        Введите времена до отказа — алгоритм автоматически найдёт
-                        параметры <span class="text-accent fw-medium">k</span> и
-                        <span class="text-accent fw-medium">λ</span> распределения Вейбулла.
+                        <span data-i18n="fitting.desc1">Введите времена до отказа — алгоритм автоматически найдёт
+                        параметры</span> <span class="text-accent fw-medium">k</span> 
+                        <span data-i18n="fitting.desc2">и</span>
+                        <span class="text-accent fw-medium">λ</span> 
+                        <span span data-i18n="fitting.desc3">распределения Вейбулла.</span>
                     </p>
         
                     <div class="row g-3 mb-3">
         
                         <div class="col-lg-8">
                             <label class="form-label small text-secondary">
-                                Времена до отказа
-                                <span class="text-muted">(через запятую или пробел)</span>
+                                <span data-i18n="fitting.dataLabel"> Времена до отказа</span>
+                               
+                                <span class="text-muted" data-i18n="fitting.dataHint">(через запятую или пробел)</span>
                             </label>
                             <textarea id="fitting-data" class="form-control app-input font-mono" rows="4"
                                 placeholder="напр: 120, 340, 280, 890, 560, 445, 670, 230, 780, 510"></textarea>
                             <div class="param-hint mt-1">
-                                <span class="hint-item">Минимум 3 значения · все числа должны быть больше 0</span>
+                                <span class="hint-item" data-i18n="fitting.minHint">Минимум 3 значения · все числа должны быть больше 0</span>
                             </div>
                         </div>
         
                         <div class="col-lg-4">
-                            <label class="form-label small text-secondary">
+                            <label class="form-label small text-secondary" data-i18n="fitting.units">
                                 Единицы измерения
                             </label>
-                            <input type="text" id="fitting-units" class="form-control app-input" placeholder="часы, циклы, км">
+                            <input type="text" id="fitting-units" class="form-control app-input" placeholder="часы, циклы, км/hours,cycles,km">
         
-                            <label class="form-label small text-secondary mt-3">
+                            <label class="form-label small text-secondary mt-3" data-i18n="fitting.orExcel">
                                 Или загрузить из Excel
                             </label>
                             <div class="d-flex gap-2">
@@ -483,7 +490,7 @@
                                 </button>
                             </div>
                             <div class="param-hint mt-1">
-                                <span class="hint-item">Используется последний загруженный файл</span>
+                                <span class="hint-item" data-i18n="fitting.excelHint">Используется последний загруженный файл</span>
                             </div>
                         </div>
         
@@ -491,10 +498,10 @@
         
                     <div class="d-flex flex-wrap gap-2 mb-4">
                         <button id="fitting-button" class="btn btn-warning font-mono">
-                            <i class="bi bi-diagram-3 me-1"></i> Подобрать k и λ
+                            <i class="bi bi-diagram-3 me-1"></i> <span data-i18n="fitting.fitButton">Подобрать k и λ</span>
                         </button>
                         <button id="fitting-clear" class="btn btn-outline-secondary font-mono">
-                            <i class="bi bi-x-circle me-1"></i> Очистить
+                            <i class="bi bi-x-circle me-1"></i> <span data-i18n="fitting.clear"></span data-i18n="fitting.clear">Очистить</span>
                         </button>
                     </div>
         
@@ -504,30 +511,30 @@
                         <div class="row g-3 mb-3">
                             <div class="col-md-3">
                                 <div class="stat-card">
-                                    <div class="stat-label">Параметр формы</div>
+                                    <div class="stat-label" data-i18n="fitting.shapeLabel">Параметр формы</div>
                                     <div class="stat-value" id="fitting-k">—</div>
                                     <div class="stat-hint">k (beta)</div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="stat-card">
-                                    <div class="stat-label">Параметр масштаба</div>
+                                    <div class="stat-label" data-i18n="fitting.scaleLabel">Параметр масштаба</div>
                                     <div class="stat-value" id="fitting-lambda">—</div>
                                     <div class="stat-hint">λ (eta)</div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="stat-card">
-                                    <div class="stat-label">Качество подбора</div>
+                                    <div class="stat-label" data-i18n="fitting.qualityLabel">Качество подбора</div>
                                     <div class="stat-value" id="fitting-r2">—</div>
                                     <div class="stat-hint">R²</div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="stat-card">
-                                    <div class="stat-label">Точек данных</div>
+                                    <div class="stat-label" data-i18n="fitting.pointsLabel">Точек данных</div>
                                     <div class="stat-value" id="fitting-n">—</div>
-                                    <div class="stat-hint">значений</div>
+                                    <div class="stat-hint" data-i18n="fitting.pointsHint">значений</div>
                                 </div>
                             </div>
                         </div>
@@ -538,7 +545,7 @@
                         <!-- Кнопка использовать параметры -->
                         <button id="fitting-use-params" class="btn btn-warning font-mono mb-4">
                             <i class="bi bi-arrow-right-circle me-1"></i>
-                            Использовать k и λ во вкладке Вейбулл
+                            <span data-i18n="fitting.useParams">Использовать k и λ во вкладке Вейбулл</span>
                         </button>
         
                     </div>
@@ -550,7 +557,8 @@
                     <div class="d-flex gap-2 mt-2">
                         <button onclick="exportChartPNG('fittingChart', 'weibull-fitting')"
                             class="btn btn-outline-secondary btn-sm font-mono">
-                            <i class="bi bi-image me-1"></i> Скачать PNG
+                            <i class="bi bi-image me-1"></i> <span data-i18n="fitting.downloadPng">Скачать PNG</span>
+                            </button>
                         </button>
                     </div>
         
@@ -563,11 +571,11 @@
             <div class="card app-card mb-4">
                 <div class="card-header d-flex align-items-center gap-2">
                     <span class="badge bg-warning text-dark font-mono">06</span>
-                    <span class="fw-semibold">Сравнение двух распределений</span>
+                    <span class="fw-semibold" data-i18n="comp.cardTitle">Сравнение двух распределений</span>
                 </div>
                 <div class="card-body">
         
-                    <p class="text-secondary small mb-4">
+                    <p class="text-secondary small mb-4" data-i18n="comp.desc">
                         Сравните два распределения Вейбулла на одном графике.
                         Например: два режима отказа, две детали или два поставщика.
                     </p>
@@ -578,25 +586,25 @@
                         <div class="col-md-6">
                             <div class="comparison-block block-a">
                                 <div class="comparison-block-label">
-                                    <span class="comparison-dot dot-a"></span>
+                                    <span class="comparison-dot dot-a" data-i18n="comp.distA"></span>
                                     Распределение А
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small text-secondary">Название</label>
+                                    <label class="form-label small text-secondary" data-i18n="comp.name">Название</label>
                                     <input type="text" id="comp-a-name" class="form-control app-input"
                                         placeholder="напр. Подшипник, Узел А">
                                 </div>
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <label class="form-label small text-secondary">
-                                            Параметр формы <span class="text-accent">(k)</span>
+                                            <span data-i18n="comp.shapeParam">Параметр формы</span> <span class="text-accent">(k)</span>
                                         </label>
                                         <input type="number" id="comp-a-k" class="form-control app-input font-mono" value="1.5"
                                             step="0.1" min="0.01">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label small text-secondary">
-                                            Параметр масштаба <span class="text-accent">(λ)</span>
+                                            <span data-i18n="comp.scaleParam">Параметр масштаба</span> <span class="text-accent">(λ)</span>
                                         </label>
                                         <input type="number" id="comp-a-lambda" class="form-control app-input font-mono"
                                             value="1000" step="1" min="0.01">
@@ -605,7 +613,7 @@
                                 <div class="mt-2">
                                     <button onclick="useFromFitting('a')" class="btn btn-outline-secondary btn-sm font-mono">
                                         <i class="bi bi-arrow-down-circle me-1"></i>
-                                        Взять из анализа данных
+                                        <span data-i18n="comp.useFromFitting">Взять из анализа данных</span>
                                     </button>
                                 </div>
                             </div>
@@ -615,8 +623,8 @@
                         <div class="col-md-6">
                             <div class="comparison-block block-b">
                                 <div class="comparison-block-label">
-                                    <span class="comparison-dot dot-b"></span>
-                                    Распределение Б
+                                    <span class="comparison-dot dot-b" data-i18n="comp.distB">Распределение Б</span>
+                                    
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label small text-secondary">Название</label>
@@ -626,14 +634,14 @@
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <label class="form-label small text-secondary">
-                                            Параметр формы <span class="text-accent">(k)</span>
+                                            <span data-i18n="comp.shapeParam">Параметр формы</span> <span class="text-accent">(k)</span>
                                         </label>
                                         <input type="number" id="comp-b-k" class="form-control app-input font-mono" value="2.5"
                                             step="0.1" min="0.01">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label small text-secondary">
-                                            Параметр масштаба <span class="text-accent">(λ)</span>
+                                            <span data-i18n="comp.scaleParam">Параметр масштаба</span> <span class="text-accent">(λ)</span>
                                         </label>
                                         <input type="number" id="comp-b-lambda" class="form-control app-input font-mono"
                                             value="1500" step="1" min="0.01">
@@ -642,7 +650,7 @@
                                 <div class="mt-2">
                                     <button onclick="useFromWeibull('b')" class="btn btn-outline-secondary btn-sm font-mono">
                                         <i class="bi bi-arrow-down-circle me-1"></i>
-                                        Взять из вкладки Вейбулл
+                                        <span data-i18n="comp.useFromWeibull">Взять из вкладки Вейбулл</span>
                                     </button>
                                 </div>
                             </div>
@@ -655,23 +663,23 @@
                         <div class="col-md-4">
                             <label class="form-label small text-secondary">Тип графика</label>
                             <select id="comp-type" class="form-select app-input font-mono">
-                                <option value="sf">SF — Функция надёжности</option>
-                                <option value="cdf">CDF — Вероятность отказа</option>
-                                <option value="pdf">PDF — Плотность вероятности</option>
+                                <option value="sf" data-i18n="comp.typeSf">SF — Функция надёжности</option>
+                                <option value="cdf" data-i18n="comp.typeCdf">CDF — Вероятность отказа</option>
+                                <option value="pdf" data-i18n="comp.typePdf">PDF — Плотность вероятности</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label small text-secondary">Единицы измерения</label>
+                            <label class="form-label small text-secondary" data-i18n="comp.units">Единицы измерения</label>
                             <input type="text" id="comp-units" class="form-control app-input" placeholder="часы, циклы, км">
                         </div>
                     </div>
         
                     <div class="d-flex flex-wrap gap-2 mb-4">
                         <button id="comparison-button" class="btn btn-warning font-mono">
-                            <i class="bi bi-layers me-1"></i> Сравнить
+                            <i class="bi bi-layers me-1"></i> <span data-i18n="comp.compareButton">Сравнить</span>
                         </button>
                         <button id="comparison-clear" class="btn btn-outline-secondary font-mono">
-                            <i class="bi bi-x-circle me-1"></i> Очистить
+                            <i class="bi bi-x-circle me-1"></i> <span data-i18n="comp.clear">Очистить</span>
                         </button>
                     </div>
         
@@ -707,10 +715,10 @@
                     <div class="d-flex gap-2 mt-2">
                         <button onclick="exportChartPNG('comparisonChart', 'comparison')"
                             class="btn btn-outline-secondary btn-sm font-mono">
-                            <i class="bi bi-image me-1"></i> Скачать PNG
+                            <i class="bi bi-image me-1"></i> <span data-i18n="comp.downloadPng">Скачать PNG</span>
                         </button>
                         <button onclick="exportChartCSV('comparison')" class="btn btn-outline-secondary btn-sm font-mono">
-                            <i class="bi bi-filetype-csv me-1"></i> Скачать CSV
+                            <i class="bi bi-filetype-csv me-1"></i> <span data-i18n="comp.downloadCsv">Скачать CSV</span>
                         </button>
                     </div>
         
@@ -722,26 +730,26 @@
         <div class="card app-card mb-5">
             <div class="card-header d-flex align-items-center gap-2">
                 <span class="badge bg-warning text-dark font-mono">05</span>
-                <span class="fw-semibold">Сохранить расчёт</span>
+                <span class="fw-semibold" data-i18n="save.cardTitle">Сохранить расчёт</span>
             </div>
             <div class="card-body">
-                <p class="text-secondary small mb-3">
+                <p class="text-secondary small mb-3" data-i18n="save.desc">
                     Сохраните текущий расчёт в личный кабинет.
                 </p>
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label small text-secondary">Название расчёта</label>
+                        <label class="form-label small text-secondary" data-i18n="save.nameLabel">Название расчёта</label>
                         <input type="text" id="calcName" class="form-control app-input"
-                            placeholder="напр. Подшипник №3, Вал турбины">
+                            data-i18n-placeholder="save.namePlaceholder" placeholder="напр. Подшипник №3, Вал турбины">
                     </div>
                 </div>
                 <button onclick="window.saveCalc()" class="btn btn-warning font-mono btn-sm">
-                    <i class="bi bi-bookmark-plus me-1"></i> Сохранить расчёт
+                    <i class="bi bi-bookmark-plus me-1"></i> <span data-i18n="save.saveButton">Сохранить расчёт</span>
                 </button>
                 <div id="saveStatus" class="mt-2 small font-mono"></div>
                 <hr class="my-4" style="border-color: var(--border-clr)">
                 <p class="text-secondary small text-uppercase font-mono ls-wide mb-3">
-                    <i class="bi bi-clock-history me-1"></i> История расчётов:
+                    <i class="bi bi-clock-history me-1"></i> <span data-i18n="save.historyLabel">История расчётов:</span>
                 </p>
                 <div id="calculationsList"></div>
             </div>
