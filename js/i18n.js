@@ -46,3 +46,12 @@ export async function initI18n() {
 export function t(key) {
     return translations[key] !== undefined ? translations[key] : key;
 }
+
+// Перевод с подстановкой переменных: t('key', {var: value})
+export function tf(key, vars = {}) {
+    let str = translations[key] !== undefined ? translations[key] : key;
+    Object.keys(vars).forEach(k => {
+        str = str.replaceAll(`{${k}}`, vars[k]);
+    });
+    return str;
+}

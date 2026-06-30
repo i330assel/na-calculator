@@ -18,12 +18,14 @@ import {
     readSingleCell, readCellRange, renderPreview
 } from './excel.js';
 
+import { t, tf } from './i18n.js';
+
 // ── Экземпляры графиков ───────────────────────────────────
 let weibullChartInstance     = null;
 let monteCarloChartInstance  = null;
 let reliabilityChartInstance = null;
 let fittingChartInstance     = null;
-let comparisonChartInstance = null;
+let comparisonChartInstance  = null;
 
 // ── Вкладки ───────────────────────────────────────────────
 window.switchTab = function(tab, btn) {
@@ -75,13 +77,13 @@ function processExcelFile(file) {
             setLoadedSheet(sheet);
 
             document.getElementById('fileName').textContent =
-                `✓ ${file.name}  (лист: "${sheetName}")`;
+                `✓ ${file.name}  ("${sheetName}")`;
             renderPreview(sheet);
             document.getElementById('previewSection').classList.remove('d-none');
             document.getElementById('mappingSection').classList.remove('d-none');
         } catch (err) {
             document.getElementById('fileName').textContent =
-                '✗ Ошибка чтения файла';
+                `✗ ${t('excel.statusReadError')}`;
             console.error(err);
         }
     };
@@ -93,7 +95,7 @@ document.getElementById('load-from-excel').addEventListener('click', function() 
     const sheet      = loadedSheet;
 
     if (!sheet) {
-        setStatus(statusEl, 'error', '✗ Сначала загрузите Excel-файл');
+        setStatus(statusEl, 'error', `✗ ${t('excel.statusNoFile')}`);
         return;
     }
 
@@ -104,13 +106,13 @@ document.getElementById('load-from-excel').addEventListener('click', function() 
 
     if (cellK) {
         const val = readSingleCell(sheet, cellK);
-        if (!val || val <= 0) { setStatus(statusEl, 'error', `✗ Ячейка ${cellK}: нет числа > 0`); return; }
+        if (!val || val <= 0) { setStatus(statusEl, 'error', `✗ ${tf('excel.statusCellNoNumber', {cell: cellK})}`); return; }
         document.getElementById('shape-param').value = val;
         loaded.push(`k = ${val}`);
     }
     if (cellLambda) {
         const val = readSingleCell(sheet, cellLambda);
-        if (!val || val <= 0) { setStatus(statusEl, 'error', `✗ Ячейка ${cellLambda}: нет числа > 0`); return; }
+        if (!val || val <= 0) { setStatus(statusEl, 'error', `✗ ${tf('excel.statusCellNoNumber', {cell: cellLambda})}`); return; }
         document.getElementById('scale-param').value = val;
         loaded.push(`λ = ${val}`);
     }
@@ -120,13 +122,13 @@ document.getElementById('load-from-excel').addEventListener('click', function() 
             const arr = readCellRange(sheet, cellX);
             xVal = arr && arr.length > 0 ? arr[0] : null;
         }
-        if (xVal === null) { setStatus(statusEl, 'error', `✗ Ячейки x: нет числа`); return; }
+        if (xVal === null) { setStatus(statusEl, 'error', `✗ ${t('excel.statusXNoNumber')}`); return; }
         document.getElementById('x-value').value = xVal;
         loaded.push(`x = ${xVal}`);
     }
 
-    if (loaded.length === 0) { setStatus(statusEl, 'error', '✗ Укажите хотя бы одну ячейку'); return; }
-    setStatus(statusEl, 'success', `✓ Загружено: ${loaded.join('  ·  ')}`);
+    if (loaded.length === 0) { setStatus(statusEl, 'error', `✗ ${t('excel.statusNoCells')}`); return; }
+    setStatus(statusEl, 'success', `✓ ${t('excel.statusLoaded')}: ${loaded.join('  ·  ')}`);
 });
 
 // ── Вейбулл ───────────────────────────────────────────────
@@ -144,13 +146,12 @@ document.getElementById('calculate-button').addEventListener('click', function()
         resultText.style.color = isError ? '#f87171' : 'var(--accent)';
     }
 
-    if (isNaN(k) || k <= 0)      { showResult('Ошибка: введите корректное k', true); return; }
-    if (isNaN(lambda) || lambda <= 0) { showResult('Ошибка: введите корректное λ', true); return; }
+    if (isNaN(k) || k <= 0)      { showResult(t('weibull.errorK'), true); return; }
+    if (isNaN(lambda) || lambda <= 0) { showResult(t('weibull.errorLambda'), true); return; }
 
     const x        = parseFloat(xInput);
     const isXValid = !isNaN(x) && x >= 0;
 
-    // Подсказка про x
     const noXHint = document.getElementById('no-x-hint');
     if (noXHint) {
         if (!isXValid) noXHint.classList.remove('d-none');
@@ -166,9 +167,9 @@ document.getElementById('calculate-button').addEventListener('click', function()
         else if (calculationType === 'cdf') result = weibullCdf(x, k, lambda);
         else                                result = weibullSf(x, k, lambda);
 
-        if (result === Infinity)                     showResult('∞ (бесконечность)', false);
+        if (result === Infinity)                     showResult(t('weibull.infinity'), false);
         else if (!isNaN(result) && isFinite(result)) showResult(result.toFixed(6), false);
-        else                                         showResult('Ошибка при расчёте', true);
+        else                                         showResult(t('weibull.errorCalc'), true);
     } else {
         resultArea.classList.add('d-none');
     }
@@ -179,7 +180,6 @@ document.getElementById('calculate-button').addEventListener('click', function()
     );
 });
 
-// Глобальная функция для dashboard.js
 window.buildWeibullChartGlobal = function(k, lambda, calcType) {
     const xUnits = document.getElementById('x-units').value.trim();
     weibullChartInstance = buildWeibullChart(
@@ -187,16 +187,18 @@ window.buildWeibullChartGlobal = function(k, lambda, calcType) {
     );
 };
 
-// Подсказки типа расчёта
-const calcTypeHints = {
-    pdf: 'Показывает в какой момент чаще всего происходят отказы',
-    cdf: 'Вероятность отказа ДО момента x (растёт от 0 до 1)',
-    sf:  'Вероятность что изделие ПЕРЕЖИВЁТ момент x (падает от 1 до 0)'
-};
-document.getElementById('calculation-type').addEventListener('change', function() {
-    const hint = document.getElementById('calcTypeHint');
-    if (hint) hint.innerHTML = `<span class="hint-item">${calcTypeHints[this.value]}</span>`;
-});
+function updateCalcTypeHint() {
+    const hints = {
+        pdf: t('weibull.hintPdf'),
+        cdf: t('weibull.hintCdf'),
+        sf:  t('weibull.hintSf')
+    };
+    const select = document.getElementById('calculation-type');
+    const hint   = document.getElementById('calcTypeHint');
+    if (hint) hint.innerHTML = `<span class="hint-item">${hints[select.value]}</span>`;
+}
+document.getElementById('calculation-type').addEventListener('change', updateCalcTypeHint);
+updateCalcTypeHint(); // выставляем правильную подсказку при загрузке
 
 // ── Монте-Карло ───────────────────────────────────────────
 document.getElementById('monte-carlo-button').addEventListener('click', function() {
@@ -212,17 +214,28 @@ document.getElementById('monte-carlo-button').addEventListener('click', function
         mcText.style.color = isError ? '#f87171' : '#38bdf8';
     }
 
-    if (isNaN(k) || k <= 0)               { showMcResult('Ошибка: введите корректное k', true); return; }
-    if (isNaN(lambda) || lambda <= 0)      { showMcResult('Ошибка: введите корректное λ', true); return; }
-    if (isNaN(numSamples) || numSamples <= 0) { showMcResult('Ошибка: введите корректное N', true); return; }
+    if (isNaN(k) || k <= 0)               { showMcResult(t('monte.errorK'), true); return; }
+    if (isNaN(lambda) || lambda <= 0)      { showMcResult(t('monte.errorLambda'), true); return; }
+    if (isNaN(numSamples) || numSamples <= 0) { showMcResult(t('monte.errorN'), true); return; }
 
     const mcData = runMonteCarlo(k, lambda, numSamples);
-    if (!mcData) { showMcResult('Не удалось сгенерировать выборки', true); return; }
+    if (!mcData) { showMcResult(t('monte.errorSamples'), true); return; }
 
     showMcResult(
-        `Среднее: ${mcData.mean.toFixed(4)}   |   Ст. отклонение: ${mcData.std.toFixed(4)}   |   Выборок: ${mcData.count}`,
+        tf('monte.resultText', {
+            mean:  mcData.mean.toFixed(4),
+            std:   mcData.std.toFixed(4),
+            count: mcData.count
+        }),
         false
     );
+
+    // Сохраняем результаты для dashboard.js (без парсинга текста)
+    window.lastMonteCarloResult = {
+        mean: mcData.mean,
+        std:  mcData.std,
+        n:    mcData.count
+    };
 
     const xUnits = document.getElementById('x-units').value.trim();
     monteCarloChartInstance = buildMonteCarloChart(
@@ -234,41 +247,40 @@ document.getElementById('monte-carlo-button').addEventListener('click', function
 document.getElementById('reliability-button').addEventListener('click', function() {
     const lambda = parseFloat(document.getElementById('rel-lambda').value);
     const tInput = document.getElementById('rel-t').value;
-    const units  = document.getElementById('rel-units').value.trim() || 'единиц времени';
+    const units  = document.getElementById('rel-units').value.trim() || t('rel.defaultUnits');
 
-    if (isNaN(lambda) || lambda <= 0) { alert('Введите корректное λ > 0'); return; }
+    if (isNaN(lambda) || lambda <= 0) { alert(t('rel.errorLambda')); return; }
 
     const mtbf = reliabilityMtbf(lambda);
     document.getElementById('rel-result-area').classList.remove('d-none');
     document.getElementById('rel-mtbf').textContent = mtbf.toFixed(2) + ' ' + units;
 
-    const t       = parseFloat(tInput);
-    const isTValid = !isNaN(t) && t >= 0;
+    const tt       = parseFloat(tInput);
+    const isTValid = !isNaN(tt) && tt >= 0;
 
     if (isTValid) {
-        const rt = reliabilityRt(lambda, t);
+        const rt = reliabilityRt(lambda, tt);
         const ft = 1 - rt;
         document.getElementById('rel-rt').textContent      = (rt * 100).toFixed(2) + '%';
         document.getElementById('rel-ft').textContent      = (ft * 100).toFixed(2) + '%';
-        document.getElementById('rel-rt-hint').textContent = `${(rt * 100).toFixed(1)}% изделий проработают дольше ${t} ${units}`;
-        document.getElementById('rel-ft-hint').textContent = `${(ft * 100).toFixed(1)}% изделий откажут до ${t} ${units}`;
-        document.getElementById('rel-interpretation').innerHTML = `
-            <i class="bi bi-lightbulb me-2"></i>
-            При λ = ${lambda}, из 100 изделий примерно <strong>${Math.round(rt * 100)}</strong>
-            проработают дольше ${t} ${units},
-            и <strong>${Math.round(ft * 100)}</strong> откажут раньше.
-            MTBF = <strong>${mtbf.toFixed(1)} ${units}</strong>.`;
+        document.getElementById('rel-rt-hint').textContent = `${(rt * 100).toFixed(1)}${t('rel.survivalText')} ${tt} ${units}`;
+        document.getElementById('rel-ft-hint').textContent = `${(ft * 100).toFixed(1)}${t('rel.failureText')} ${tt} ${units}`;
+        document.getElementById('rel-interpretation').innerHTML = tf('rel.interpretation', {
+            lambda, t: tt, units,
+            rt: Math.round(rt * 100),
+            ft: Math.round(ft * 100),
+            mtbf: mtbf.toFixed(1)
+        });
     } else {
         document.getElementById('rel-rt').textContent = '—';
         document.getElementById('rel-ft').textContent = '—';
-        document.getElementById('rel-interpretation').innerHTML = `
-            <i class="bi bi-info-circle me-2"></i>
-            MTBF = <strong>${mtbf.toFixed(2)} ${units}</strong>.
-            Введите t для расчёта R(t).`;
+        document.getElementById('rel-interpretation').innerHTML = tf('rel.interpretationNoT', {
+            mtbf: mtbf.toFixed(2), units
+        });
     }
 
     reliabilityChartInstance = buildReliabilityChart(
-        reliabilityChartInstance, lambda, units, isTValid ? t : null
+        reliabilityChartInstance, lambda, units, isTValid ? tt : null
     );
 });
 
@@ -294,10 +306,10 @@ function parseInputData(raw) {
 window.loadFittingFromExcel = function() {
     const rangeStr = document.getElementById('fitting-cell-range').value.trim();
     const sheet    = loadedSheet;
-    if (!sheet) { alert('Сначала загрузите Excel файл'); return; }
-    if (!rangeStr) { alert('Введите диапазон ячеек'); return; }
+    if (!sheet) { alert(t('fitting.errorNoExcelFile')); return; }
+    if (!rangeStr) { alert(t('fitting.errorNoRange')); return; }
     const values = readCellRange(sheet, rangeStr);
-    if (!values || values.length === 0) { alert('Нет числовых данных в диапазоне'); return; }
+    if (!values || values.length === 0) { alert(t('fitting.errorNoData')); return; }
     document.getElementById('fitting-data').value = values.join(', ');
 };
 
@@ -306,7 +318,7 @@ document.getElementById('fitting-button').addEventListener('click', function() {
     const units = document.getElementById('fitting-units').value.trim();
     const data  = parseInputData(raw);
 
-    if (data.length < 3) { alert('Введите минимум 3 значения больше нуля'); return; }
+    if (data.length < 3) { alert(t('fitting.errorMinData')); return; }
 
     const { k, lambda, r2, sorted, ranks } = fitWeibull(data);
 
@@ -316,16 +328,17 @@ document.getElementById('fitting-button').addEventListener('click', function() {
     document.getElementById('fitting-r2').textContent      = r2.toFixed(4);
     document.getElementById('fitting-n').textContent       = data.length;
 
-    // Интерпретация
-    let qualityText = r2 >= 0.95 ? '✓ Отличное совпадение'
-                    : r2 >= 0.85 ? '~ Хорошее совпадение'
-                    : r2 >= 0.70 ? '⚠ Приемлемое совпадение — используйте с осторожностью'
-                    :              '✗ Слабое совпадение — проверьте данные';
+    let qualityText = r2 >= 0.95 ? t('fitting.qualityExcellent')
+                    : r2 >= 0.85 ? t('fitting.qualityGood')
+                    : r2 >= 0.70 ? t('fitting.qualityAcceptable')
+                    :              t('fitting.qualityPoor');
 
-    let kText = k < 1   ? `k < 1 (${k.toFixed(2)}) — ранние отказы`
-              : k < 1.5 ? `k ≈ 1 (${k.toFixed(2)}) — случайные отказы`
-              : k < 3   ? `k = ${k.toFixed(2)} — нормальный износ`
-              :            `k > 3 (${k.toFixed(2)}) — быстрый износ`;
+    let kCategory = k < 1   ? t('fitting.kEarly')
+                  : k < 1.5 ? t('fitting.kRandom')
+                  : k < 3   ? t('fitting.kNormal')
+                  :           t('fitting.kFast');
+
+    let kText = `k = ${k.toFixed(2)} — ${kCategory}`;
 
     document.getElementById('fitting-interpretation').innerHTML = `
         <div class="mb-1"><i class="bi bi-info-circle me-2"></i><strong>${qualityText}</strong></div>
@@ -382,7 +395,7 @@ document.getElementById('clear-button').addEventListener('click', function() {
     }
 });
 
-// ── Экспорт ───────────────────────────────────────────────
+// ── Экспорт PNG ───────────────────────────────────────────
 window.exportChartPNG = function(canvasId, filename) {
     const canvas       = document.getElementById(canvasId);
     if (!canvas) return;
@@ -399,6 +412,7 @@ window.exportChartPNG = function(canvasId, filename) {
     link.click();
 };
 
+// ── Экспорт CSV (единая версия для всех графиков, включая comparison) ──
 window.exportChartCSV = function(type) {
     let chartInstance = null;
     let headers       = '';
@@ -408,13 +422,43 @@ window.exportChartCSV = function(type) {
         const calcType = document.getElementById('calculation-type').value.toUpperCase();
         const units    = document.getElementById('x-units').value.trim() || 'x';
         headers = `${units},${calcType}\n`;
+
     } else if (type === 'reliability') {
         chartInstance = reliabilityChartInstance;
         const units = document.getElementById('rel-units').value.trim() || 't';
         headers = `${units},R(t)\n`;
+
+    } else if (type === 'comparison') {
+        chartInstance = comparisonChartInstance;
+        const units  = document.getElementById('comp-units').value.trim() || 'x';
+        const aName  = document.getElementById('comp-a-name').value.trim() || 'A';
+        const bName  = document.getElementById('comp-b-name').value.trim() || 'B';
+        headers = `${units},${aName},${bName}\n`;
+
+        if (!chartInstance) { alert(t('export.noChart')); return; }
+
+        const pointsA = chartInstance.data.datasets[0].data;
+        const pointsB = chartInstance.data.datasets[1].data;
+        const maxLen  = Math.max(pointsA.length, pointsB.length);
+
+        let csv = headers;
+        for (let i = 0; i < maxLen; i++) {
+            const x  = pointsA[i]?.x ?? pointsB[i]?.x ?? '';
+            const yA = pointsA[i]?.y ?? '';
+            const yB = pointsB[i]?.y ?? '';
+            csv += `${x},${yA},${yB}\n`;
+        }
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.download = `comparison-${new Date().toISOString().slice(0,10)}.csv`;
+        link.href     = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        return;
     }
 
-    if (!chartInstance) { alert('Сначала постройте график'); return; }
+    if (!chartInstance) { alert(t('export.noChart')); return; }
 
     const labels = chartInstance.data.labels;
     const data   = chartInstance.data.datasets[0].data;
@@ -439,19 +483,17 @@ function setStatus(el, type, text) {
 
 // ── Сравнение распределений ───────────────────────────────
 
-// Взять параметры из вкладки "Анализ данных"
 window.useFromFitting = function(slot) {
     const k      = document.getElementById('fitting-k').textContent;
     const lambda = document.getElementById('fitting-lambda').textContent;
     if (k === '—' || lambda === '—') {
-        alert('Сначала выполните анализ данных');
+        alert(t('comp.errorNoFitting'));
         return;
     }
     document.getElementById(`comp-${slot}-k`).value      = k;
     document.getElementById(`comp-${slot}-lambda`).value = lambda;
 };
 
-// Взять параметры из вкладки "Вейбулл"
 window.useFromWeibull = function(slot) {
     const k      = document.getElementById('shape-param').value;
     const lambda = document.getElementById('scale-param').value;
@@ -464,68 +506,65 @@ document.getElementById('comparison-button').addEventListener('click', function(
     const aLambda = parseFloat(document.getElementById('comp-a-lambda').value);
     const bK      = parseFloat(document.getElementById('comp-b-k').value);
     const bLambda = parseFloat(document.getElementById('comp-b-lambda').value);
-    const aName   = document.getElementById('comp-a-name').value.trim() || 'Распределение А';
-    const bName   = document.getElementById('comp-b-name').value.trim() || 'Распределение Б';
+    const aName   = document.getElementById('comp-a-name').value.trim() || t('comp.defaultNameA');
+    const bName   = document.getElementById('comp-b-name').value.trim() || t('comp.defaultNameB');
     const calcType = document.getElementById('comp-type').value;
     const units    = document.getElementById('comp-units').value.trim();
 
-    // Валидация
     if (isNaN(aK) || aK <= 0 || isNaN(aLambda) || aLambda <= 0) {
-        alert('Проверьте параметры распределения А'); return;
+        alert(t('comp.errorParamsA')); return;
     }
     if (isNaN(bK) || bK <= 0 || isNaN(bLambda) || bLambda <= 0) {
-        alert('Проверьте параметры распределения Б'); return;
+        alert(t('comp.errorParamsB')); return;
     }
 
     const dataA = { k: aK, lambda: aLambda, name: aName };
     const dataB = { k: bK, lambda: bLambda, name: bName };
 
-    // Строим график
     comparisonChartInstance = buildComparisonChart(
         comparisonChartInstance, dataA, dataB, calcType, units
     );
 
-    // Считаем итоги
-    // MTTF = λ * Γ(1 + 1/k) ≈ λ * (1 + 1/k - 1)! для простоты используем λ
-    // Для сравнения используем λ как характерную жизнь
-    const aB10 = aLambda * Math.pow(-Math.log(0.9), 1 / aK); // время когда 10% откажут
+    const aB10 = aLambda * Math.pow(-Math.log(0.9), 1 / aK);
     const bB10 = bLambda * Math.pow(-Math.log(0.9), 1 / bK);
-
-    const aB50 = aLambda * Math.pow(-Math.log(0.5), 1 / aK); // медиана
+    const aB50 = aLambda * Math.pow(-Math.log(0.5), 1 / aK);
     const bB50 = bLambda * Math.pow(-Math.log(0.5), 1 / bK);
 
-    // Показываем итоги
     document.getElementById('comparison-summary').classList.remove('d-none');
     document.getElementById('comp-a-name-display').textContent = aName;
     document.getElementById('comp-b-name-display').textContent = bName;
 
+    const tenPctText = t('comp.percentText');
+    const fiftyPctText = t('comp.percent50Text');
+    const b10Text = t('comp.b10Text');
+    const medianLabel = t('comp.medianLabel');
+
     document.getElementById('comp-a-stats').innerHTML = `
         k = ${aK} · λ = ${aLambda} ${units}<br>
         B10 = ${aB10.toFixed(1)} ${units}<br>
-        <span class="text-secondary">10% откажут к этому моменту</span><br>
-        Медиана = ${aB50.toFixed(1)} ${units}<br>
-        <span class="text-secondary">50% откажут к этому моменту</span>
+        <span class="text-secondary">${tenPctText} ${b10Text}</span><br>
+        ${medianLabel} = ${aB50.toFixed(1)} ${units}<br>
+        <span class="text-secondary">${fiftyPctText} ${b10Text}</span>
     `;
 
     document.getElementById('comp-b-stats').innerHTML = `
         k = ${bK} · λ = ${bLambda} ${units}<br>
         B10 = ${bB10.toFixed(1)} ${units}<br>
-        <span class="text-secondary">10% откажут к этому моменту</span><br>
-        Медиана = ${bB50.toFixed(1)} ${units}<br>
-        <span class="text-secondary">50% откажут к этому моменту</span>
+        <span class="text-secondary">${tenPctText} ${b10Text}</span><br>
+        ${medianLabel} = ${bB50.toFixed(1)} ${units}<br>
+        <span class="text-secondary">${fiftyPctText} ${b10Text}</span>
     `;
 
-    // Интерпретация
     const betterB10  = aB10 > bB10 ? aName : bName;
     const betterLong = aLambda > bLambda ? aName : bName;
     const worseShort = aB10 < bB10 ? aName : bName;
 
     document.getElementById('comparison-interpretation').innerHTML = `
         <i class="bi bi-lightbulb me-2"></i>
-        <strong>${betterB10}</strong> надёжнее в начале срока службы (выше B10).
-        На длинном горизонте лучше <strong>${betterLong}</strong> (выше λ).
+        <strong>${betterB10}</strong> ${t('comp.interpretationBetter')}.
+        ${t('comp.interpretationLong')} <strong>${betterLong}</strong> ${t('comp.interpretationLongSuffix')}.
         ${aB10 !== bB10
-            ? `<strong>${worseShort}</strong> имеет больше ранних отказов.`
+            ? `<strong>${worseShort}</strong> ${t('comp.interpretationWorse')}.`
             : ''}
     `;
 });
@@ -543,64 +582,3 @@ document.getElementById('comparison-clear').addEventListener('click', function()
         comparisonChartInstance = null;
     }
 });
-
-// Экспорт CSV для сравнительного графика
-window.exportChartCSV = function(type) {
-    let chartInstance = null;
-    let headers       = '';
-
-    if (type === 'weibull') {
-        chartInstance = weibullChartInstance;
-        const calcType = document.getElementById('calculation-type').value.toUpperCase();
-        const units    = document.getElementById('x-units').value.trim() || 'x';
-        headers = `${units},${calcType}\n`;
-    } else if (type === 'reliability') {
-        chartInstance = reliabilityChartInstance;
-        const units = document.getElementById('rel-units').value.trim() || 't';
-        headers = `${units},R(t)\n`;
-    } else if (type === 'comparison') {
-        chartInstance = comparisonChartInstance;
-        const units  = document.getElementById('comp-units').value.trim() || 'x';
-        const aName  = document.getElementById('comp-a-name').value.trim() || 'А';
-        const bName  = document.getElementById('comp-b-name').value.trim() || 'Б';
-        headers = `${units},${aName},${bName}\n`;
-
-        if (!chartInstance) { alert('Сначала постройте график'); return; }
-
-        const pointsA = chartInstance.data.datasets[0].data;
-        const pointsB = chartInstance.data.datasets[1].data;
-        const maxLen  = Math.max(pointsA.length, pointsB.length);
-
-        let csv = headers;
-        for (let i = 0; i < maxLen; i++) {
-            const x  = pointsA[i]?.x ?? pointsB[i]?.x ?? '';
-            const yA = pointsA[i]?.y ?? '';
-            const yB = pointsB[i]?.y ?? '';
-            csv += `${x},${yA},${yB}\n`;
-        }
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.download = `comparison-${new Date().toISOString().slice(0,10)}.csv`;
-        link.href     = URL.createObjectURL(blob);
-        link.click();
-        URL.revokeObjectURL(link.href);
-        return;
-    }
-
-    if (!chartInstance) { alert('Сначала постройте график'); return; }
-
-    const labels = chartInstance.data.labels;
-    const data   = chartInstance.data.datasets[0].data;
-    let csv      = headers;
-    labels.forEach((label, i) => {
-        csv += `${label},${data[i] !== null ? data[i] : ''}\n`;
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.download = `${type}-${new Date().toISOString().slice(0,10)}.csv`;
-    link.href     = URL.createObjectURL(blob);
-    link.click();
-    URL.revokeObjectURL(link.href);
-};
